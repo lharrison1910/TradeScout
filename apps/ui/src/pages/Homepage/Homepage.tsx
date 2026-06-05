@@ -8,6 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { SnapReceiptCard } from "../../components/SnapRecieptCard/SnapRecieptCard";
 
 const Homepage = () => {
   const [daysTill, setDaysTill] = useState(30);
@@ -20,9 +21,16 @@ const Homepage = () => {
         height: "100%",
       }}
     >
-      <Paper sx={{ display: "flex", flexDirection: "column " }}>
+      <Paper
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          height: "15%",
+          justifyContent: "space-around",
+        }}
+      >
         <Typography variant="h2">Hello User!</Typography>
-        <Typography>Current MTD Quarter: </Typography>
+        <Typography>Current MTD Quarter: Q2 (Apr 26 - Jun 26)</Typography>
         <Typography>
           <LinearProgress
             variant="determinate"
@@ -34,10 +42,12 @@ const Homepage = () => {
       </Paper>
       <Paper>
         <Typography>Log expense</Typography>
+        <SnapReceiptCard />
         <Button>Log Income</Button>
         <Button>Log Expense</Button>
-        <Button>Pending</Button>
+        <Button>Pending (3)</Button>
       </Paper>
+
       <Paper>
         <Typography>Recent Activity</Typography>
         <List>

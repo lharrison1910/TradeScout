@@ -2,100 +2,89 @@ import { createTheme } from "@mui/material/styles";
 
 export const tradeScoutTheme = createTheme({
   palette: {
-    // The Base: Dark Slate / Scout Green
+    // Crucial: This tells MUI to flip all its default text and borders to light colors
+    mode: "dark",
+
+    // The Main Action: Hi-Vis Site Green
     primary: {
-      main: "#0f172a", // Tailwind slate-900
-      contrastText: "#ffffff",
+      main: "#22c55e", // Vibrant, high-contrast green
+      dark: "#16a34a", // Slightly darker for button hover states
+      contrastText: "#0f172a", // Dark text on the green button so it pops
     },
-    // The Action: Hi-Vis Safety Orange
-    secondary: {
-      main: "#f97316", // Tailwind orange-500
-      dark: "#ea580c", // Tailwind orange-600 for hover states
-      contrastText: "#ffffff",
-    },
+
+    // The Base: Dark Slate
     background: {
-      default: "#f8fafc", // Tailwind slate-50 (reduces outdoor screen glare)
-      paper: "#ffffff", // Pure white for task cards
+      default: "#0f172a", // Deep slate for the very back of the app
+      paper: "#1e293b", // Slightly lighter slate for the task cards so they stand out
     },
+
+    // Text: Light grey/white for readability against the slate
     text: {
-      primary: "#0f172a", // High contrast black/slate
-      secondary: "#64748b", // Tailwind slate-500 for helper text
+      primary: "#f8fafc", // Crisp, off-white for main text
+      secondary: "#94a3b8", // Softer grey for dates, helper text, and subtitles
     },
+
+    // Kept red for HMRC deadlines and overdue warnings
     error: {
-      main: "#ef4444", // Red for overdue HMRC warnings
+      main: "#ef4444",
     },
   },
   typography: {
-    // Use a sturdy, highly legible font
     fontFamily: '"Inter", "Barlow", "Roboto", sans-serif',
     h1: {
       fontWeight: 800,
-      letterSpacing: "-0.025em", // Tightly tracked for impact
+      letterSpacing: "-0.025em",
       fontSize: "2.25rem",
+      color: "#f8fafc", // Forces H1 to be the brightest white
     },
     h2: {
       fontWeight: 800,
       fontSize: "1.5rem",
+      color: "#f8fafc",
     },
     h3: {
       fontWeight: 700,
       fontSize: "1.125rem",
+      color: "#f8fafc",
+    },
+    body1: {
+      color: "#cbd5e1", // A very readable light grey for standard text
+    },
+    body2: {
+      color: "#94a3b8", // The secondary text color for minor details
     },
     button: {
       fontWeight: 800,
-      textTransform: "uppercase", // Screams "CLICK ME"
+      textTransform: "uppercase",
       letterSpacing: "0.05em",
     },
   },
   components: {
-    // Override default MUI Buttons to be massive and fat-finger friendly
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 16, // Big, soft corners
-          padding: "16px 24px", // Massive touch targets
-          boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+          borderRadius: 16,
+          padding: "16px 24px",
+          // Removes the default MUI shadow because flat design looks better in dark mode
+          boxShadow: "none",
           "&:active": {
-            transform: "scale(0.98)", // Satisfying physical "click" feel
+            transform: "scale(0.98)",
           },
         },
-        // Use a conditional contained override so the style is applied only
-        // when the button's color is "secondary" (avoids using a non-existent class key)
-        contained: ({ ownerState }: any) => ({
-          ...(ownerState?.color === "secondary" && {
-            fontSize: "1.25rem", // Makes the Hi-Vis orange button text bigger
-          }),
-        }),
+        containedPrimary: {
+          fontSize: "1.25rem",
+        },
       },
     },
-    // Override default MUI Cards to look like our "Inbox" items
     MuiCard: {
       styleOverrides: {
         root: {
           borderRadius: 16,
-          border: "1px solid #f1f5f9", // subtle border
-          boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+          // Instead of a shadow, we use a subtle border to separate the card from the background
+          border: "1px solid #334155",
+          backgroundColor: "#1e293b",
           padding: "16px",
-        },
-      },
-    },
-
-    MuiTypography: {
-      styleOverrides: {
-        root: {
-          color: "#ffffffff",
-        },
-        h1: {
-          color: "#0f172a",
-        },
-        h2: {
-          color: "#0f172a",
-        },
-        body1: {
-          color: "#1e293b",
-        },
-        body2: {
-          color: "#64748b",
+          backgroundImage: "none", // Prevents MUI from applying its default dark mode overlay
         },
       },
     },
