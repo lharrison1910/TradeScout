@@ -9,53 +9,62 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { SnapReceiptCard } from "../../components/SnapRecieptCard/SnapRecieptCard";
+import ExpenseModal from "../../components/ExpenseModal/ExpenseModal";
 
 const Homepage = () => {
   const [daysTill, setDaysTill] = useState(30);
+  const [expenseModal, setExpenseModal] = useState<boolean>(false);
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 4,
-        height: "100%",
-      }}
-    >
-      <Paper
+    <>
+      <Box
         sx={{
           display: "flex",
           flexDirection: "column",
-          height: "15%",
-          justifyContent: "space-around",
+          gap: 4,
+          height: "100%",
         }}
       >
-        <Typography variant="h2">Hello User!</Typography>
-        <Typography>Current MTD Quarter: Q2 (Apr 26 - Jun 26)</Typography>
-        <Typography>
-          <LinearProgress
-            variant="determinate"
-            value={daysTill}
-            sx={{ width: "75%" }}
-          />
-          {daysTill} Days left
-        </Typography>
-      </Paper>
-      <Paper>
-        <Typography>Log expense</Typography>
-        <SnapReceiptCard />
-        <Button>Log Income</Button>
-        <Button>Log Expense</Button>
-        <Button>Pending (3)</Button>
-      </Paper>
+        <Paper
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            height: "15%",
+            justifyContent: "space-around",
+          }}
+        >
+          <Typography variant="h2">Hello User!</Typography>
+          <Typography>Current MTD Quarter: Q2 (Apr 26 - Jun 26)</Typography>
+          <Typography>
+            <LinearProgress
+              variant="determinate"
+              value={daysTill}
+              sx={{ width: "75%" }}
+            />
+            {daysTill} Days left
+          </Typography>
+        </Paper>
+        <Paper>
+          <Typography>Log expense</Typography>
+          <SnapReceiptCard />
+          <Button>Log Income</Button>
+          <Button onClick={() => setExpenseModal(true)}>Log Expense</Button>
+          <Button>Pending (3)</Button>
+        </Paper>
 
-      <Paper>
-        <Typography>Recent Activity</Typography>
-        <List>
-          {/*map for items */}
-          <ListItem></ListItem>
-        </List>
-      </Paper>
-    </Box>
+        <Paper>
+          <Typography>Recent Activity</Typography>
+          <List>
+            {/*map for items */}
+            <ListItem></ListItem>
+          </List>
+        </Paper>
+      </Box>
+
+      <ExpenseModal
+        open={expenseModal}
+        handleClose={() => setExpenseModal(false)}
+      />
+    </>
   );
 };
 

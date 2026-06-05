@@ -1,11 +1,60 @@
-import { Box, Button, Modal, Typography } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  Button,
+  Modal,
+  TextField,
+  Typography,
+} from "@mui/material";
 
 const ExpenseModal = ({ open, handleClose }) => {
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "80%",
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    p: 4,
+
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+  };
   return (
     <Modal open={open} onClose={handleClose}>
-      <Box>
-        <Button onClick={handleClose}>Back</Button>
-        <Typography>New Expense</Typography>
+      <Box sx={style}>
+        <Box>
+          <Button
+            onClick={handleClose}
+            size="small"
+            sx={{ position: "absolute", left: 10, top: 5 }}
+          >
+            Back
+          </Button>
+          <Typography>New Expense</Typography>
+        </Box>
+        <Box>
+          <Typography>Gross amount (£):</Typography>
+          <TextField type="number" />
+          <Typography>HMRC Category:</Typography>
+          <Autocomplete
+            options={[]}
+            renderInput={(params) => <TextField {...params} label="HRMC Cat" />}
+          />
+          <Typography>Attach to an ongoing job</Typography>
+          <Autocomplete
+            options={[]}
+            renderInput={(params) => (
+              <TextField {...params} label="Attach to job" />
+            )}
+          />
+          <Typography>Comments (Options)</Typography>
+          <TextField />
+        </Box>
       </Box>
     </Modal>
   );
