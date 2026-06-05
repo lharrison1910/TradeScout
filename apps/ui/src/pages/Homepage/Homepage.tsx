@@ -12,8 +12,43 @@ import { SnapReceiptCard } from "../../components/SnapRecieptCard/SnapRecieptCar
 import ExpenseModal from "../../components/ExpenseModal/ExpenseModal";
 
 const Homepage = () => {
-  const [daysTill, setDaysTill] = useState(30);
   const [expenseModal, setExpenseModal] = useState<boolean>(false);
+
+  const getFiscalQuarter = (
+    startMonth: number,
+    date: Date = new Date(),
+  ): string => {
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    const currentMonth = date.getMonth();
+
+    const startMonthIndex = startMonth - 1;
+
+    const elapsedMonths = (currentMonth - startMonthIndex + 12) % 12;
+
+    const quarterStartElapsed = elapsedMonths - (elapsedMonths % 3);
+
+    const qStartMonthIndex = (startMonthIndex + quarterStartElapsed) % 12;
+    const qEndMonthIndex = (qStartMonthIndex + 2) % 12;
+
+    return `${monthNames[qStartMonthIndex]}-${monthNames[qEndMonthIndex]}`;
+  };
+
+  const currentQuarter = getFiscalQuarter(4);
+
   return (
     <>
       <Box
@@ -33,14 +68,14 @@ const Homepage = () => {
           }}
         >
           <Typography variant="h2">Hello User!</Typography>
-          <Typography>Current MTD Quarter: Q2 (Apr 26 - Jun 26)</Typography>
+          <Typography>Current MTD Quarter: Q2 ({currentQuarter})</Typography>
           <Typography>
             <LinearProgress
               variant="determinate"
-              value={daysTill}
+              value={30}
               sx={{ width: "75%" }}
             />
-            {daysTill} Days left
+            {30} Days left
           </Typography>
         </Paper>
         <Paper>

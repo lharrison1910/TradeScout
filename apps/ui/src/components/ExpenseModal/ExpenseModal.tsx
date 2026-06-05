@@ -6,6 +6,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { HmrcCategoryEnum } from "@tradescout/shared/HmrcCategoryEnum";
 
 const ExpenseModal = ({ open, handleClose }) => {
   const style = {
@@ -42,8 +43,9 @@ const ExpenseModal = ({ open, handleClose }) => {
           <TextField type="number" />
           <Typography>HMRC Category:</Typography>
           <Autocomplete
-            options={[]}
-            renderInput={(params) => <TextField {...params} label="HRMC Cat" />}
+            options={Object.values(HmrcCategoryEnum)}
+            getOptionLabel={(option) => String(option)}
+            renderInput={(params) => <TextField {...params} label="HMRC Cat" />}
           />
           <Typography>Attach to an ongoing job</Typography>
           <Autocomplete
