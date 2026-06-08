@@ -6,9 +6,16 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { HmrcCategoryEnum } from "@tradescout/shared/HmrcCategoryEnum";
+import { CategoryLabels } from "./DropdownOptionts";
+import { useState } from "react";
 
 const ExpenseModal = ({ open, handleClose }) => {
+  const [formData, setFormData] = useState({
+    amount: 0,
+    job: 0,
+    category: "",
+    comments: "",
+  });
   const style = {
     position: "absolute",
     top: "50%",
@@ -25,12 +32,33 @@ const ExpenseModal = ({ open, handleClose }) => {
     justifyContent: "center",
     alignItems: "center",
   };
+
+  const closeModal = () => {
+    setFormData({
+      total: 0,
+      paymentType: "Bank Transfer",
+      job: 0,
+      dateReceived: dayjs(),
+    });
+
+    handleClose();
+  };
+
+  const handleChange = (name: string, value: unknown) => {
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSave = () => {
+    console.log(formData);
+    //TODO: send data away
+    //validation
+  };
   return (
     <Modal open={open} onClose={handleClose}>
       <Box sx={style}>
         <Box>
           <Button
-            onClick={handleClose}
+            onClick={closeModal}
             size="small"
             sx={{ position: "absolute", left: 10, top: 5 }}
           >
@@ -40,22 +68,40 @@ const ExpenseModal = ({ open, handleClose }) => {
         </Box>
         <Box>
           <Typography>Gross amount (£):</Typography>
-          <TextField type="number" />
+          <TextField
+            type="number"
+            name="amount"
+            value={formData.amount}
+            onChange={(event) => handleChange("amount", event.target.value)}
+          />
           <Typography>HMRC Category:</Typography>
           <Autocomplete
-            options={Object.values(HmrcCategoryEnum)}
+            options={Object.values(CategoryLabels)}
             getOptionLabel={(option) => String(option)}
+            onChange={(newValue) => handleChange("category", newValue)}
             renderInput={(params) => <TextField {...params} label="HMRC Cat" />}
           />
           <Typography>Attach to an ongoing job</Typography>
           <Autocomplete
             options={[]}
+            onChange={(newValue) => handleChange("job", newValue)}
             renderInput={(params) => (
               <TextField {...params} label="Attach to job" />
             )}
           />
           <Typography>Comments (Options)</Typography>
-          <TextField />
+
+          <TextField
+            type="text"
+            name="comments"
+            onChange={(event) => handleChange("comments", event.target.value)}
+          />
+        </Box>
+        <Box>
+          <Button color="success">Save</Button>
+          <Button color="error" onClick={closeModal}>
+            Cancel
+          </Button>
         </Box>
       </Box>
     </Modal>

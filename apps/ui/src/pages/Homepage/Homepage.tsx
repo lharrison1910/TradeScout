@@ -10,9 +10,11 @@ import {
 import { useState } from "react";
 import { SnapReceiptCard } from "../../components/SnapRecieptCard/SnapRecieptCard";
 import ExpenseModal from "../../components/ExpenseModal/ExpenseModal";
+import IncomeModal from "../../components/IncomeModal/IncomeModal";
 
 const Homepage = () => {
   const [expenseModal, setExpenseModal] = useState<boolean>(false);
+  const [incomeModal, setIncomeModal] = useState<boolean>(false);
 
   const getFiscalQuarter = (
     startMonth: number,
@@ -80,8 +82,8 @@ const Homepage = () => {
         </Paper>
         <Paper>
           <Typography>Log expense</Typography>
-          <SnapReceiptCard />
-          <Button>Log Income</Button>
+          <SnapReceiptCard title="Snap Reciept" />
+          <Button onClick={() => setIncomeModal(true)}>Log Income</Button>
           <Button onClick={() => setExpenseModal(true)}>Log Expense</Button>
           <Button>Pending (3)</Button>
         </Paper>
@@ -98,6 +100,10 @@ const Homepage = () => {
       <ExpenseModal
         open={expenseModal}
         handleClose={() => setExpenseModal(false)}
+      />
+      <IncomeModal
+        open={incomeModal}
+        handleClose={() => setIncomeModal(false)}
       />
     </>
   );

@@ -1,5 +1,3 @@
-// apps/api/src/database/entities/income.entity.ts
-
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -13,8 +11,8 @@ import { User } from "./user.entity";
 
 @Entity("incomes")
 export class Income {
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @PrimaryGeneratedColumn({ type: "integer" })
+  id!: number;
 
   @Column({ type: "decimal", precision: 10, scale: 2 })
   amount: number;
