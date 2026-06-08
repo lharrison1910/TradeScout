@@ -10,7 +10,7 @@ import {
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import { useNavigate } from "@tanstack/react-router";
 
-export const SnapReceiptCard = ({ title }: { title: string }) => {
+export const SnapReceiptCard = ({ title, handleformChange }) => {
   const navigate = useNavigate();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -38,6 +38,7 @@ export const SnapReceiptCard = ({ title }: { title: string }) => {
 
     const formData = new FormData();
     formData.append("receipt", file);
+    handleformChange("proof", formData);
 
     try {
       setIsUploading(true);
@@ -51,10 +52,10 @@ export const SnapReceiptCard = ({ title }: { title: string }) => {
       await new Promise((resolve) => setTimeout(resolve, 1500));
       const mockTempReceiptId = "temp_123_abc";
 
-      navigate({
-        to: "/expense/new",
-        search: { tempReceiptId: mockTempReceiptId },
-      });
+      // navigate({
+      //   to: "/expense/new",
+      //   search: { tempReceiptId: mockTempReceiptId },
+      // });
     } catch (err) {
       console.error("Upload failed:", err);
       setError("Failed to upload receipt. Please check your signal.");

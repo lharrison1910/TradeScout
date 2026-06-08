@@ -20,7 +20,7 @@ interface incomeType {
   paymentType: string;
   job: number;
   dateReceived: Dayjs;
-  proof?: File;
+  proof?: FormData;
 }
 
 const IncomeModal = ({ open, handleClose }) => {
@@ -30,9 +30,8 @@ const IncomeModal = ({ open, handleClose }) => {
     job: 0,
     dateReceived: dayjs(),
   });
-  const [errors, setErrors] = useState<Record<string, string> | undefined>(
-    undefined,
-  );
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const closeModal = () => {
     setFormData({
@@ -41,6 +40,7 @@ const IncomeModal = ({ open, handleClose }) => {
       job: 0,
       dateReceived: dayjs(),
     });
+    setErrors({});
 
     handleClose();
   };
@@ -52,7 +52,7 @@ const IncomeModal = ({ open, handleClose }) => {
   const handleSave = () => {
     const formattedData = {
       ...formData,
-      dateRecieved: formData.dateReceived.toISOString(),
+      dateReceived: formData.dateReceived.toISOString(),
     };
 
     const result = IncomeBaseSchema.safeParse(formattedData);
@@ -63,12 +63,10 @@ const IncomeModal = ({ open, handleClose }) => {
         const key = String(issue.path[0] ?? "");
         formattedErrors[key] = issue.message;
       });
+      console.log(formattedErrors);
       setErrors(formattedErrors);
       return;
     }
-
-    //TODO: send data
-    console.log(formattedData);
   };
 
   const style = {
@@ -76,7 +74,7 @@ const IncomeModal = ({ open, handleClose }) => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "80%",
+    maxWidth: "80%",
     bgcolor: "background.paper",
     border: "2px solid #000",
     boxShadow: 24,
@@ -108,7 +106,7 @@ const IncomeModal = ({ open, handleClose }) => {
             name="total"
             value={formData.total}
             onChange={(event) =>
-              handleChange(event.target.name, event.target.value)
+              handleChange(event.target.name, Number(event.target.value))
             }
             error={!!errors.total}
             helperText={errors.total}
@@ -122,6 +120,7 @@ const IncomeModal = ({ open, handleClose }) => {
             onChange={(event) =>
               handleChange(event.target.name, event.target.value)
             }
+            error={!!errors.paymentType}
           >
             <MenuItem value={"Bank Transfer"}>Bank Transfer</MenuItem>
             <MenuItem value={"Cash"}>Cash</MenuItem>
@@ -140,7 +139,10 @@ const IncomeModal = ({ open, handleClose }) => {
 
           <Divider />
           <Box>
-            <SnapReceiptCard title="Snap Income" />
+            <SnapReceiptCard
+              title="Snap Income"
+              handleformChange={handleChange}
+            />
           </Box>
         </Box>
         <Box>
