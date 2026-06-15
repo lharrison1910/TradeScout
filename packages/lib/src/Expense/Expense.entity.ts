@@ -7,8 +7,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from "typeorm";
-import { User } from "./user.entity";
-import { ExpenseCategory } from "../enums/expense-category.enum";
+import { User } from "../User/User.entity";
+import { HmrcCategoryEnum } from "../../../shared/HmrcCategoryEnum";
 
 @Entity("expenses")
 export class Expense {
@@ -26,10 +26,10 @@ export class Expense {
 
   @Column({
     type: "enum",
-    enum: ExpenseCategory,
-    default: ExpenseCategory.COST_OF_GOODS,
+    enum: HmrcCategoryEnum,
+    default: HmrcCategoryEnum.COST_OF_GOODS,
   })
-  category: ExpenseCategory;
+  category: HmrcCategoryEnum;
 
   @Column({ type: "varchar", length: 255, nullable: true })
   description: string; // e.g., "Timber from Travis Perkins"

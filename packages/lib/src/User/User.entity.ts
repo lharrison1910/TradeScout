@@ -6,8 +6,8 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from "typeorm";
-import { Expense } from "./expense.entity";
-import { Income } from "./income.entity";
+import { Expense } from "../Expense/Expense.entity";
+import { Income } from "../Income/Income.entity";
 
 @Entity("users")
 export class User {

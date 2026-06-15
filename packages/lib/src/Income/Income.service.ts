@@ -35,8 +35,10 @@ export class IncomeService {
   }
 
   async addIncome(payload) {
+    const income = this.incomeRepository.create(payload);
+
     try {
-      return await this.incomeRepository.save(payload);
+      return await this.incomeRepository.save(income);
     } catch (err) {
       this.logger.error(`addIncome: ${err}`);
       throw new InternalServerErrorException("Failed to save new income");
@@ -49,9 +51,11 @@ export class IncomeService {
     try {
       const deleted = await this.incomeRepository.delete(id);
 
-      if (deleted.affected < 1) {
-        throw new BadRequestException(`No income found with id: ${id}`);
+      if(!deleted.affected || deleted.affected < 1){
+        throw  new BadRequestException(`No income found with id: ${id}`);
       }
+
+
 
       return deleted.affected;
     } catch (err) {

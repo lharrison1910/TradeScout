@@ -17,11 +17,14 @@ export class Income {
   @Column({ type: "decimal", precision: 10, scale: 2 })
   amount: number;
 
-  @Column({ type: "date" })
-  transactionDate: Date;
+  @Column({ type: "timestamp" })
+  dateReceived: string;
 
   @Column({ type: "varchar", length: 255 })
   source: string;
+
+  @Column({ type: "varchar" })
+  paymentType: string;
 
   @Column({ type: "varchar", nullable: true })
   evidenceObjectKey: string;
