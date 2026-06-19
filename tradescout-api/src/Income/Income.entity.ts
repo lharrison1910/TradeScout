@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -45,6 +46,9 @@ export class Income {
 
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
+
+  @DeleteDateColumn({ type: 'timestamptz' })
+  deletedAt: Date;
 
   @ManyToOne(() => User, (user) => user.incomes, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })

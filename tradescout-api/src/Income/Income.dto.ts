@@ -8,3 +8,7 @@ export interface CreateIncomeDto {
   isDailyTotal: boolean;
   reference: string;
 }
+
+export interface UpdateIncomeDto extends CreateIncomeDto {
+  id: number;
+}

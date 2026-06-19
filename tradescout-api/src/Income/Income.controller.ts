@@ -1,17 +1,20 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Post,
+  Put,
   Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { IncomeService } from './Income.service';
-import type { CreateIncomeDto } from './Income.dto';
+import type { CreateIncomeDto, UpdateIncomeDto } from './Income.dto';
 import { JwtAuthGuard } from 'src/Auth/auth.guard';
+import { CurrentUser } from 'src/decorator/currentUser.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('income')
@@ -19,9 +22,32 @@ export class IncomeController {
   constructor(private readonly incomeService: IncomeService) {}
 
   @Post()
-  async addIncome(@Body() body: CreateIncomeDto) {
-    const id = '';
-    return await this.incomeService.addIncome(id, body);
+  async addIncome(
+    @Body() body: CreateIncomeDto,
+    @CurrentUser('userId') currentUser: number,
+  ) {
+    return await this.incomeService.addIncome(currentUser, body);
+  }
+
+  @Get()
+  async getIncome(@CurrentUser('userId') currentUser: number) {
+    return await this.incomeService.getIncome(currentUser);
+  }
+
+  @Put()
+  async updateIncome(
+    @Body() body: UpdateIncomeDto,
+    @CurrentUser('userId') currentUser: number,
+  ) {
+    return await this.incomeService.updateIncome(currentUser, body.id, body);
+  }
+
+  @Delete()
+  async deleteIncome(
+    @Query('id') id: number,
+    @CurrentUser('userId') currentUser: number,
+  ) {
+    return await this.incomeService.deleteIncome(currentUser, id);
   }
 
   @Get('export')
