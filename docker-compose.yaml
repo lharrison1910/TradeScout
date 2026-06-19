@@ -1,0 +1,20 @@
+services:
+  db:
+    container_name: tradescout_DB
+    image: postgis/postgis:17-3.5
+    restart: always
+    environment:
+      - POSTGRES_DB=Local
+      - POSTGRES_USER=tradescout
+      - POSTGRES_PASSWORD=temp_pass
+    ports:
+      - "5432:5432"
+    platform: linux/x86_64
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: temp_pass
+    ports:
+      - "5051:80"
