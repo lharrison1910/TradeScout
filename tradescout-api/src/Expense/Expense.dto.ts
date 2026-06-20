@@ -9,3 +9,7 @@ export interface CreateExpenseDto {
   isCapitalAsset: boolean;
   description?: string;
 }
+
+export interface UpdateExpenseDto extends CreateExpenseDto {
+  id: number;
+}

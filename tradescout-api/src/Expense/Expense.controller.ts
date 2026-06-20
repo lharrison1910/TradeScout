@@ -7,10 +7,12 @@ import {
   Post,
   Body,
   UseGuards,
+  Put,
+  Delete,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { ExpenseService } from './Expense.service';
-import type { CreateExpenseDto } from './Expense.dto';
+import type { CreateExpenseDto, UpdateExpenseDto } from './Expense.dto';
 import { JwtAuthGuard } from 'src/Auth/auth.guard';
 import { CurrentUser } from 'src/decorator/currentUser.decorator';
 
@@ -18,6 +20,35 @@ import { CurrentUser } from 'src/decorator/currentUser.decorator';
 @Controller('expense')
 export class ExpenseController {
   constructor(private readonly expenseService: ExpenseService) {}
+
+  @Get()
+  async getExpense(@CurrentUser('userId') currentUser: number) {
+    return await this.expenseService.getExpenses(currentUser);
+  }
+
+  @Post()
+  async addExpense(
+    @Body() body: CreateExpenseDto,
+    @CurrentUser('userId') currentUser: number,
+  ) {
+    return await this.expenseService.addExpense(currentUser, body);
+  }
+
+  @Put()
+  async updateExpense(
+    @Body() body: UpdateExpenseDto,
+    @CurrentUser('userId') currentUser: number,
+  ) {
+    return await this.expenseService.updateExpense(currentUser, body);
+  }
+
+  @Delete()
+  async deleteExpense(
+    @Query('id') id: number,
+    @CurrentUser('userId') currentUser: number,
+  ) {
+    return await this.expenseService.deleteExpense(currentUser, id);
+  }
 
   @Get('export')
   async exportCsv(
@@ -41,10 +72,5 @@ export class ExpenseController {
     );
 
     return res.status(HttpStatus.OK).send(csvData);
-  }
-
-  @Post()
-  async addExpense(@Body() body: CreateExpenseDto) {
-    return await this.expenseService.addExpense('', body);
   }
 }

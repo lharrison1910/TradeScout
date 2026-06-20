@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Expense } from './Expense.entity';
 import { Repository } from 'typeorm';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
-import { CreateExpenseDto } from './Expense.dto';
+import { CreateExpenseDto, UpdateExpenseDto } from './Expense.dto';
 
 @Injectable()
 export class ExpenseService {
@@ -18,6 +18,97 @@ export class ExpenseService {
     @InjectPinoLogger(ExpenseService.name)
     private readonly logger: PinoLogger,
   ) {}
+
+  async getExpenses(currentUser: number) {
+    let expenses: Expense[];
+    try {
+      expenses = await this.expenseRepository.find({
+        where: { userId: currentUser },
+      });
+    } catch (error) {
+      this.logger.error(`getExpenses - failed to get expenses: ${error}`);
+      throw new InternalServerErrorException('Failed to get expenses');
+    }
+
+    if (expenses.length === 0) {
+      throw new NotFoundException('No expenses were found');
+    }
+
+    return expenses;
+  }
+
+  async addExpense(currentUser: number, payload: CreateExpenseDto) {
+    const expense = this.expenseRepository.create({
+      userId: currentUser,
+      ...payload,
+    });
+
+    try {
+      return await this.expenseRepository.save(expense);
+    } catch (error) {
+      this.logger.error(`addExpense: ${error}`);
+      throw new InternalServerErrorException('Failed to save expense');
+    }
+  }
+
+  async updateExpense(currentUser: number, payload: UpdateExpenseDto) {
+    let expense: Expense | null;
+    const { id } = payload;
+
+    try {
+      expense = await this.expenseRepository.findOne({
+        where: { userId: currentUser, id },
+      });
+    } catch (error) {
+      this.logger.error(
+        `updateExpense - failed to get expense ${id}: ${error} `,
+      );
+      throw new InternalServerErrorException(`Failed to update Expense ${id}`);
+    }
+
+    if (!expense) {
+      throw new NotFoundException(`Expense ${id} was not found`);
+    }
+
+    try {
+      const updatedExpense = await this.expenseRepository.update(id, payload);
+      return updatedExpense.affected;
+    } catch (error) {
+      this.logger.error(
+        `updateExpense - failed to update expense ${id}: ${error}`,
+      );
+      throw new InternalServerErrorException('Failed to update expense');
+    }
+  }
+
+  async deleteExpense(currentUser: number, id: number) {
+    let expense: Expense | null;
+
+    try {
+      expense = await this.expenseRepository.findOne({
+        where: { id, userId: currentUser },
+      });
+    } catch (error) {
+      this.logger.error(
+        `deleteExpense - failed to find ${id} to delete: ${error}`,
+      );
+      throw new InternalServerErrorException('Failed to find record to delete');
+    }
+
+    if (!expense) {
+      throw new NotFoundException(`Failed to find ${id} to delete`);
+    }
+
+    try {
+      const deleted = await this.expenseRepository.softDelete(id);
+      return deleted.affected;
+    } catch (error) {
+      this.logger.error(
+        `deleteexpense - failed to soft delete ${id}: ${error}`,
+      );
+      throw new InternalServerErrorException('Failed to delete expense');
+    }
+  }
 
   async exportQuarterlyCsv(
     businessId: string,
@@ -77,37 +168,5 @@ export class ExpenseService {
     }
 
     return csvRows.join('\n');
-  }
-
-  async addExpense(currentUser: number, payload: CreateExpenseDto) {
-    const expense = this.expenseRepository.create({
-      userId: currentUser,
-      ...payload,
-    });
-
-    try {
-      return await this.expenseRepository.save(expense);
-    } catch (error) {
-      this.logger.error(`addExpense: ${error}`);
-      throw new InternalServerErrorException('Failed to save expense');
-    }
-  }
-
-  async getExpenses(currentUser: number) {
-    let expenses: Expense[];
-    try {
-      expenses = await this.expenseRepository.find({
-        where: { userId: currentUser },
-      });
-    } catch (error) {
-      this.logger.error(`getExpenses - failed to get expenses: ${error}`);
-      throw new InternalServerErrorException('Failed to get expenses');
-    }
-
-    if (expenses.length === 0) {
-      throw new NotFoundException('No expenses were found');
-    }
-
-    return expenses;
   }
 }
