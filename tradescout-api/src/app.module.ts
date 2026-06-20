@@ -5,6 +5,7 @@ import { IncomeModule } from './Income/Income.module';
 import { ExpenseModule } from './Expense/Expense.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './Auth/Auth.module';
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AuthModule } from './Auth/Auth.module';
     IncomeModule,
     ExpenseModule,
     AuthModule,
+    SeedModule,
   ],
   controllers: [],
   providers: [],

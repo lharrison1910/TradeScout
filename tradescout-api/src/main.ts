@@ -5,6 +5,7 @@ import { Logger } from 'nestjs-pino';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import { SeedService } from './seed/seed.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -30,6 +31,8 @@ async function bootstrap() {
   });
 
   enableSwagger(app);
+  const seed = app.get(SeedService);
+  await seed.run();
 
   await app.listen(process.env.PORT ?? 3000);
 }
