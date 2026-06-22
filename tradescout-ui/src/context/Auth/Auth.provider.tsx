@@ -1,23 +1,9 @@
-import { createContext, useContext, useMemo } from "react";
-import type { User } from "../../types/User";
+import { useMemo } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { userApiClient } from "../../api/UserApiClient";
-
-export interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  isPending: boolean;
-  error: Error | null;
-}
+import { AuthContext, type AuthContextType } from "./auth.context";
 
 type AuthProviderProps = { children: React.ReactNode };
-
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isAuthenticated: false,
-  isPending: false,
-  error: null,
-});
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const {
@@ -41,5 +27,3 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
-export const useAuth = (): AuthContextType => useContext(AuthContext);
