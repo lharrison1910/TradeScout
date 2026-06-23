@@ -5,8 +5,8 @@ import { useAuth } from "../useAuth/useAuth";
 export const useLogin = () => {
   const { login } = useAuth();
   return useMutation({
-    mutationKey: ["login"],
-    mutationFn: (body) => userApiClient.login(body),
+    mutationKey: ["passwordLogin"],
+    mutationFn: userApiClient.login,
     onSuccess: (data) => login(data),
   });
 };

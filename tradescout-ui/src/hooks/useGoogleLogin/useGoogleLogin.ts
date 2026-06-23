@@ -5,5 +5,6 @@ export const useGoogleLogin = () => {
   return useQuery({
     queryKey: ["googleLogin"],
     queryFn: () => userApiClient.googleLogin(),
+    enabled: false,
   });
 };

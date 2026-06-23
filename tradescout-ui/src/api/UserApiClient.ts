@@ -1,3 +1,4 @@
+import type { LoginPayload } from "../types/loginPayload";
 import { BaseApi } from "./BaseApi";
 
 class UserApiClient extends BaseApi {
@@ -16,7 +17,7 @@ class UserApiClient extends BaseApi {
     return UserApiClient.instance;
   }
 
-  async login(payload: { email: string; password: string }) {
+  async login(payload: LoginPayload) {
     const body = JSON.stringify(payload);
     return await this.post(this.auth, body);
   }

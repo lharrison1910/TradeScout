@@ -8,10 +8,12 @@ import {
 import { useLogin } from "../../hooks/useLogin/useLogin";
 import { useState } from "react";
 import { useGoogleLogin } from "../../hooks/useGoogleLogin/useGoogleLogin";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const { mutate, isPending } = useLogin();
+  const { data, isFetching, refetch, error } = useGoogleLogin();
 
   const handleLogin = () => {
     if (!loginForm.email || !loginForm.password) {
@@ -25,9 +27,9 @@ const Login = () => {
     const { name, value } = event.target;
     setLoginForm({ ...loginForm, [name]: value });
   };
-  const { data } = useGoogleLogin();
 
   const handleGoogleLogin = () => {
+    refetch();
     console.log(data);
   };
 
@@ -35,9 +37,16 @@ const Login = () => {
     return <CircularProgress />;
   }
 
+  if (isFetching) {
+    return <CircularProgress />;
+  }
+
+  if (error) {
+    console.log(error);
+  }
+
   return (
     <>
-      {/* password login */}
       <Box
         sx={{
           display: "flex",
@@ -65,13 +74,11 @@ const Login = () => {
             value={loginForm.password}
           />
         </Box>
-        <Button>Login</Button>
+        <Button onClick={handleLogin}>Login</Button>
       </Box>
 
       <Box>
-        <Button onClick={handleLogin} onClick={handleGoogleLogin}>
-          Sign in with google
-        </Button>
+        <Button onClick={handleGoogleLogin}>Sign in with google</Button>
       </Box>
 
       <Button>Create account</Button>
