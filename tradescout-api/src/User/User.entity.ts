@@ -9,6 +9,12 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+export enum AuthProviderType {
+  LOCAL = 'local',
+  GOOGLE = 'google',
+  APPLE = 'apple',
+}
+
 @Entity('User')
 export class User {
   @PrimaryGeneratedColumn({ type: 'integer' })
@@ -17,8 +23,18 @@ export class User {
   @Column({ type: 'varchar', unique: true })
   email: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   password: string;
+
+  @Column({
+    type: 'enum',
+    enum: AuthProviderType,
+    default: AuthProviderType.LOCAL,
+  })
+  authProvider: AuthProviderType;
+
+  @Column({ type: 'varchar', nullable: true })
+  providerId: string | null;
 
   @Column({ type: 'varchar' })
   name: string;
