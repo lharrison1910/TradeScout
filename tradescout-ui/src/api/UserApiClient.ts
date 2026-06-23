@@ -6,6 +6,7 @@ class UserApiClient extends BaseApi {
 
   constructor() {
     super();
+    this.login.bind(this);
   }
 
   static getInstance(): UserApiClient {
