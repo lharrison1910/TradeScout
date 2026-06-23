@@ -56,19 +56,9 @@ const Login = () => {
             onChange={handleChange}
             value={loginForm.email}
           />
-          <TextField
-            name="email"
-            onChange={handleChange}
-            value={loginForm.email}
-          />
         </Box>
         <Box>
           <Typography>Password</Typography>
-          <TextField
-            name="password"
-            onChange={handleChange}
-            value={loginForm.password}
-          />
           <TextField
             name="password"
             onChange={handleChange}
