@@ -1,12 +1,12 @@
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
+import type { QueryClient } from "@tanstack/react-query";
+import type { AuthContextType } from "./context/Auth/auth.context";
 // import "./App.css";
 
 export type RouterContext = {
-  // auth: AuthContextType;
-  // queryClient: QueryClient;
-  auth: any;
-  queryClient: any;
+  auth: AuthContextType;
+  queryClient: QueryClient;
 };
 
 const router = createRouter({
@@ -21,10 +21,6 @@ declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
   }
-  // interface HistoryState {
-  //   toast?: Toast;
-  //   sortie?: NewSortieDto;
-  // }
 }
 
 const App = () => {

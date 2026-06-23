@@ -1,6 +1,23 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
+import { useLogin } from "../../hooks/useLogin/useLogin";
+import { useState } from "react";
 
 const Login = () => {
+  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const { mutate, isPending } = useLogin();
+
+  const handleLogin = () => {
+    if (!loginForm.email || !loginForm.password) {
+      console.log("need email and password");
+    } else {
+      mutate(loginForm);
+    }
+  };
+
+  const handleChange = (event: { target: { name: string; value: string } }) => {
+    const { name, value } = event.target;
+    setLoginForm({ ...loginForm, [name]: value });
+  };
   return (
     <>
       <Box
@@ -16,15 +33,23 @@ const Login = () => {
       >
         <Box>
           <Typography>Email</Typography>
-          <TextField />
+          <TextField
+            name="email"
+            onChange={handleChange}
+            value={loginForm.email}
+          />
         </Box>
         <Box>
           <Typography>Password</Typography>
-          <TextField />
+          <TextField
+            name="password"
+            onChange={handleChange}
+            value={loginForm.password}
+          />
         </Box>
       </Box>
 
-      <Button>Login</Button>
+      <Button onClick={handleLogin}>Login</Button>
 
       <Button>Create account</Button>
     </>
