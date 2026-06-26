@@ -1,13 +1,60 @@
+
+import {
+  Box,
+  Button,
+  CircularProgress,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useLogin } from "../../hooks/useLogin/useLogin";
+import { useState } from "react";
+import { useGoogleLogin } from "../../hooks/useGoogleLogin/useGoogleLogin";
+import { toast } from "react-toastify";
+
+const Login = () => {
+  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const { mutate, isPending } = useLogin();
+  const { data, isFetching, refetch, error } = useGoogleLogin();
+
+  const handleLogin = () => {
+    if (!loginForm.email || !loginForm.password) {
+      console.log("need email and password");
+    } else {
+      mutate(loginForm);
+    }
+  };
+
+  const handleChange = (event: { target: { name: string; value: string } }) => {
+    const { name, value } = event.target;
+    setLoginForm({ ...loginForm, [name]: value });
+  };
+
+  const handleGoogleLogin = () => {
+    refetch();
+    console.log(data);
+
 import { Box, Button, TextField, Typography } from "@mui/material";
 
 const Login = () => {
   const handleGoogleLogin = () => {
     window.location.href = "http://localhost:3000/api/auth/google";
+
   };
+
+  if (isPending) {
+    return <CircularProgress />;
+  }
+
+  if (isFetching) {
+    return <CircularProgress />;
+  }
+
+  if (error) {
+    console.log(error);
+  }
 
   return (
     <>
-      {/* password login */}
       <Box
         sx={{
           display: "flex",
@@ -21,13 +68,21 @@ const Login = () => {
       >
         <Box>
           <Typography>Email</Typography>
-          <TextField />
+          <TextField
+            name="email"
+            onChange={handleChange}
+            value={loginForm.email}
+          />
         </Box>
         <Box>
           <Typography>Password</Typography>
-          <TextField />
+          <TextField
+            name="password"
+            onChange={handleChange}
+            value={loginForm.password}
+          />
         </Box>
-        <Button>Login</Button>
+        <Button onClick={handleLogin}>Login</Button>
       </Box>
 
       <Box>
