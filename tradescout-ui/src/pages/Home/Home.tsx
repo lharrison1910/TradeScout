@@ -10,6 +10,8 @@ import {
 import { SnapRecieptCard } from "../../components/SnapRecieptCard/SnapRecieptCard";
 import ExpenseModal from "../../components/ExpenseModal/ExpenseModal";
 import IncomeModal from "../../components/IncomeModal/IncomeModal";
+import { useState } from "react";
+import { useGetIncome } from "../../hooks/useGetIncome/useGetIncome";
 
 const Home = () => {
   const [expenseModal, setExpenseModal] = useState<boolean>(false);
@@ -49,6 +51,10 @@ const Home = () => {
   };
 
   const currentQuater = getFiscalQuarter(new Date().getMonth() + 1);
+
+  const { data: income } = useGetIncome();
+
+  console.log(income);
   return (
     <>
       <Box

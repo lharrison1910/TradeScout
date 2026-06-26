@@ -8,15 +8,18 @@ import {
   Alert,
 } from "@mui/material";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
-import { useNavigate } from "@tanstack/react-router";
+// import { useNavigate } from "@tanstack/react-router";
 
 interface SnapRecieptCardProps {
-    title: string;
-    handleFormChange: (receipt: FormData) => void;
+  title: string;
+  handleFormChange: (receipt: FormData) => void;
 }
 
-export const SnapRecieptCard = ({ title, handleFormChange }:SnapRecieptCardProps) => {
-  const navigate = useNavigate();
+export const SnapRecieptCard = ({
+  title,
+  handleFormChange,
+}: SnapRecieptCardProps) => {
+  // const navigate = useNavigate();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -55,7 +58,6 @@ export const SnapRecieptCard = ({ title, handleFormChange }:SnapRecieptCardProps
 
       // Fake upload delay for MVP simulation
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      const mockTempReceiptId = "temp_123_abc";
 
       // navigate({
       //   to: "/expense/new",

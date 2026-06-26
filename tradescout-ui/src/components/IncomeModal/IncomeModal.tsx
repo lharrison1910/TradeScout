@@ -13,7 +13,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { SnapRecieptCard } from "../SnapRecieptCard/SnapRecieptCard";
 import { useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
-import { IncomeBaseSchema } from "@tradescout/shared/schema/IncomeSchema";
+// import { IncomeBaseSchema } from "@tradescout/shared/schema/IncomeSchema";
 
 interface incomeType {
   total: number;
@@ -55,18 +55,20 @@ const IncomeModal = ({ open, handleClose }) => {
       dateReceived: formData.dateReceived.toISOString(),
     };
 
-    const result = IncomeBaseSchema.safeParse(formattedData);
+    console.log(formattedData);
 
-    if (!result.success) {
-      const formattedErrors: Record<string, string> = {};
-      result.error.issues.forEach((issue) => {
-        const key = String(issue.path[0] ?? "");
-        formattedErrors[key] = issue.message;
-      });
-      console.log(formattedErrors);
-      setErrors(formattedErrors);
-      return;
-    }
+    // const result = IncomeBaseSchema.safeParse(formattedData);
+
+    // if (!result.success) {
+    //   const formattedErrors: Record<string, string> = {};
+    //   result.error.issues.forEach((issue) => {
+    //     const key = String(issue.path[0] ?? "");
+    //     formattedErrors[key] = issue.message;
+    //   });
+    //   console.log(formattedErrors);
+    //   setErrors(formattedErrors);
+    //   return;
+    // }
   };
 
   const style = {
@@ -139,9 +141,9 @@ const IncomeModal = ({ open, handleClose }) => {
 
           <Divider />
           <Box>
-            <SnapReceiptCard
+            <SnapRecieptCard
               title="Snap Income"
-              handleformChange={handleChange}
+              handleFormChange={(formData) => handleChange("reciept", formData)}
             />
           </Box>
         </Box>

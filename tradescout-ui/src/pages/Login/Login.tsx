@@ -1,11 +1,8 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { useGoogleLogin } from "../../hooks/useGoogleLogin/useGoogleLogin";
 
 const Login = () => {
-  // const { data } = useGoogleLogin();
-
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:3000/api/auth/google';
+    window.location.href = "http://localhost:3000/api/auth/google";
   };
 
   return (
