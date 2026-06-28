@@ -22,7 +22,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     if (!auth?.user && location.pathname !== "/login") {
       throw redirect({
         to: "/login",
-        search: { redirectUrl: location.href },
       });
     }
 
