@@ -16,7 +16,7 @@ export class BaseApi {
   async post(url: string, body: string) {
     const res = await fetch(`${this.url}/${url}`, {
       method: "POST",
-      headers: {},
+      headers: { "Content-Type": "application/json" },
       body: body,
       credentials: "include",
     });

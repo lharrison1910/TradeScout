@@ -5,6 +5,12 @@ export const generateMockUsers = async () => {
 
   return [
     {
+      email: 'admin',
+      password: defaultPasswordHash,
+      name: 'admin',
+      termsAccepted: true,
+    },
+    {
       email: 'bob@tradescout.com',
       password: defaultPasswordHash,
       name: 'Bob Builder',

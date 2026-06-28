@@ -1,13 +1,7 @@
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
-import type { QueryClient } from "@tanstack/react-query";
-import type { AuthContextType } from "./context/Auth/auth.context";
+import { useAuth } from "./hooks/useAuth/useAuth";
 // import "./App.css";
-
-export type RouterContext = {
-  auth: AuthContextType;
-  queryClient: QueryClient;
-};
 
 const router = createRouter({
   routeTree,
@@ -24,7 +18,8 @@ declare module "@tanstack/react-router" {
 }
 
 const App = () => {
-  return <RouterProvider router={router} />;
+  const { auth } = useAuth();
+  return <RouterProvider router={router} context={{ auth }} />;
 };
 
 export default App;
