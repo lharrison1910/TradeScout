@@ -1,4 +1,3 @@
-
 import {
   Box,
   Button,
@@ -8,13 +7,10 @@ import {
 } from "@mui/material";
 import { useLogin } from "../../hooks/useLogin/useLogin";
 import { useState } from "react";
-import { useGoogleLogin } from "../../hooks/useGoogleLogin/useGoogleLogin";
-import { toast } from "react-toastify";
 
 const Login = () => {
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-  const { mutate, isPending } = useLogin();
-  const { data, isFetching, refetch, error } = useGoogleLogin();
+  const { mutate, isPending, error } = useLogin();
 
   const handleLogin = () => {
     if (!loginForm.email || !loginForm.password) {
@@ -30,22 +26,10 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    refetch();
-    console.log(data);
-
-import { Box, Button, TextField, Typography } from "@mui/material";
-
-const Login = () => {
-  const handleGoogleLogin = () => {
     window.location.href = "http://localhost:3000/api/auth/google";
-
   };
 
   if (isPending) {
-    return <CircularProgress />;
-  }
-
-  if (isFetching) {
     return <CircularProgress />;
   }
 

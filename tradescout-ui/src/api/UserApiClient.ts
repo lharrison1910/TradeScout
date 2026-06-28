@@ -19,7 +19,7 @@ class UserApiClient extends BaseApi {
 
   async login(payload: LoginPayload) {
     const body = JSON.stringify(payload);
-    return await this.post(this.auth, body);
+    return await this.post(`${this.auth}/login`, body);
   }
 
   async logout() {
