@@ -12,10 +12,12 @@ import ExpenseModal from "../../components/ExpenseModal/ExpenseModal";
 import IncomeModal from "../../components/IncomeModal/IncomeModal";
 import { useState } from "react";
 import { useGetIncome } from "../../hooks/useGetIncome/useGetIncome";
+import { useAuth } from "../../hooks/useAuth/useAuth";
 
 const Home = () => {
   const [expenseModal, setExpenseModal] = useState<boolean>(false);
   const [incomeModal, setIncomeModal] = useState<boolean>(false);
+  const { user } = useAuth();
 
   const getFiscalQuarter = (
     startMonth: number,
@@ -73,7 +75,7 @@ const Home = () => {
             justifyContent: "space-around",
           }}
         >
-          <Typography variant="h2">Hello User!</Typography>
+          <Typography variant="h2">Hello {user.name}!</Typography>
           <Typography>Current MTD Quarter: Q2 ({currentQuater})</Typography>
           <Typography>
             <LinearProgress
