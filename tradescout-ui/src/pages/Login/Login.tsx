@@ -6,11 +6,21 @@ import {
   Typography,
 } from "@mui/material";
 import { useLogin } from "../../hooks/useLogin/useLogin";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../hooks/useAuth/useAuth";
+import { useNavigate } from "@tanstack/react-router";
 
 const Login = () => {
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const { mutate, isPending, error } = useLogin();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigate({ to: "/" });
+    }
+  }, [user, navigate]);
 
   const handleLogin = () => {
     if (!loginForm.email || !loginForm.password) {
