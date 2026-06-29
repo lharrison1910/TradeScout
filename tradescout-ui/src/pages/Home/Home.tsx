@@ -93,7 +93,7 @@ const Home = () => {
             title="Snap Reciept"
             handleFormChange={(formData) => console.log(formData)}
           />
-          <Button>Log Income</Button>
+          <Button onClick={() => setIncomeModal(true)}>Log Income</Button>
           <Button>Log Expense</Button>
           <Button>Pending (3)</Button>
         </Paper>

@@ -20,21 +20,22 @@ interface incomeType {
   paymentType: string;
   job: number;
   dateReceived: Dayjs;
-  proof?: FormData;
 }
 
 const IncomeModal = ({ open, handleClose }) => {
-  const [formData, setFormData] = useState<incomeType>({
+  const [form, setForm] = useState<incomeType>({
     total: 0,
     paymentType: "Bank Transfer",
     job: 0,
     dateReceived: dayjs(),
   });
 
+  const formData = new FormData();
+
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const closeModal = () => {
-    setFormData({
+    setForm({
       total: 0,
       paymentType: "Bank Transfer",
       job: 0,
@@ -46,16 +47,18 @@ const IncomeModal = ({ open, handleClose }) => {
   };
 
   const handleChange = (name: string, value: unknown) => {
-    setFormData({ ...formData, [name]: value });
+    setForm({ ...form, [name]: value });
   };
 
   const handleSave = () => {
     const formattedData = {
-      ...formData,
-      dateReceived: formData.dateReceived.toISOString(),
+      ...form,
+      dateReceived: form.dateReceived.toISOString(),
     };
 
     console.log(formattedData);
+
+    formData.append("incomeDetails", JSON.stringify(form));
 
     // const result = IncomeBaseSchema.safeParse(formattedData);
 
@@ -106,7 +109,7 @@ const IncomeModal = ({ open, handleClose }) => {
           <TextField
             type="number"
             name="total"
-            value={formData.total}
+            value={form.total}
             onChange={(event) =>
               handleChange(event.target.name, Number(event.target.value))
             }
@@ -118,7 +121,7 @@ const IncomeModal = ({ open, handleClose }) => {
           <Select
             fullWidth
             name="paymentType"
-            value={formData.paymentType}
+            value={form.paymentType}
             onChange={(event) =>
               handleChange(event.target.name, event.target.value)
             }
@@ -134,7 +137,7 @@ const IncomeModal = ({ open, handleClose }) => {
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DateTimePicker
               name="dateReceived"
-              value={formData.dateReceived}
+              value={form.dateReceived}
               onChange={(newValue) => handleChange("dateReceived", newValue)}
             />
           </LocalizationProvider>
@@ -143,7 +146,9 @@ const IncomeModal = ({ open, handleClose }) => {
           <Box>
             <SnapRecieptCard
               title="Snap Income"
-              handleFormChange={(formData) => handleChange("reciept", formData)}
+              handleFormChange={(file) => {
+                formData.append("proof", file);
+              }}
             />
           </Box>
         </Box>
