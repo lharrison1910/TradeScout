@@ -13,13 +13,22 @@ export class BaseApi {
     return res.json();
   }
 
-  async post(url: string, body: string) {
-    const res = await fetch(`${this.url}/${url}`, {
+  async post(url: string, body: string | FormData) {
+    const baseFetchOptions = {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: body,
+      body,
       credentials: "include",
-    });
+    };
+    let fetchOptions;
+
+    if (typeof body === "string") {
+      fetchOptions = {
+        ...baseFetchOptions,
+        headers: { "Content-Type": "application/json" },
+      };
+    }
+
+    const res = await fetch(`${this.url}/${url}`, fetchOptions);
 
     if (!res.ok) {
       throw new Error(res.statusText);

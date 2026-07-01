@@ -7,12 +7,14 @@ import {
   Select,
   MenuItem,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { SnapRecieptCard } from "../SnapRecieptCard/SnapRecieptCard";
 import { useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
+import { usePostIncome } from "../../hooks/usePostIncome/usePostIncome";
 // import { IncomeBaseSchema } from "@tradescout/shared/schema/IncomeSchema";
 
 interface incomeType {
@@ -29,10 +31,10 @@ const IncomeModal = ({ open, handleClose }) => {
     job: 0,
     dateReceived: dayjs(),
   });
-
   const formData = new FormData();
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const { mutate, isPending, error } = usePostIncome();
 
   const closeModal = () => {
     setForm({
@@ -56,9 +58,9 @@ const IncomeModal = ({ open, handleClose }) => {
       dateReceived: form.dateReceived.toISOString(),
     };
 
-    console.log(formattedData);
+    formData.append("incomeDetails", JSON.stringify(formattedData));
 
-    formData.append("incomeDetails", JSON.stringify(form));
+    mutate(formData);
 
     // const result = IncomeBaseSchema.safeParse(formattedData);
 
@@ -90,6 +92,7 @@ const IncomeModal = ({ open, handleClose }) => {
     justifyContent: "center",
     alignItems: "center",
   };
+
   return (
     <Modal open={open} onClose={closeModal}>
       <Box sx={style}>
@@ -118,6 +121,9 @@ const IncomeModal = ({ open, handleClose }) => {
           />
 
           <Typography>Client / Job Reference</Typography>
+          <TextField />
+
+          <Typography>Payment type</Typography>
           <Select
             fullWidth
             name="paymentType"

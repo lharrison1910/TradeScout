@@ -19,7 +19,7 @@ class IncomeApiClient extends BaseApi {
     return await this.get(this.income);
   }
 
-  async createIncome(payload) {
+  async createIncome(payload: FormData) {
     return await this.post(this.income, payload);
   }
 }

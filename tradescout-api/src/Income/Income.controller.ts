@@ -13,19 +13,17 @@ import {
 import type { Response } from 'express';
 import { IncomeService } from './Income.service';
 import type { CreateIncomeDto, UpdateIncomeDto } from './Income.dto';
-import { JwtAuthGuard } from 'src/Auth/auth.guard';
-import { CurrentUser } from 'src/decorator/currentUser.decorator';
+import { JwtAuthGuard } from '../Auth/auth.guard';
+import { CurrentUser } from '../decorator/currentUser.decorator';
 
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 @Controller('income')
 export class IncomeController {
   constructor(private readonly incomeService: IncomeService) {}
 
   @Post()
-  async addIncome(
-    @Body() body: CreateIncomeDto,
-    @CurrentUser('userId') currentUser: number,
-  ) {
+  async addIncome(@Body() body, @CurrentUser('userId') currentUser: number) {
+    console.log(body, 'i have reached the controller');
     return await this.incomeService.addIncome(currentUser, body);
   }
 
@@ -34,21 +32,21 @@ export class IncomeController {
     return await this.incomeService.getIncome(currentUser);
   }
 
-  @Put()
-  async updateIncome(
-    @Body() body: UpdateIncomeDto,
-    @CurrentUser('userId') currentUser: number,
-  ) {
-    return await this.incomeService.updateIncome(currentUser, body.id, body);
-  }
+  // @Put()
+  // async updateIncome(
+  //   @Body() body: UpdateIncomeDto,
+  //   @CurrentUser('userId') currentUser: number,
+  // ) {
+  //   return await this.incomeService.updateIncome(currentUser, body.id, body);
+  // }
 
-  @Delete()
-  async deleteIncome(
-    @Query('id') id: number,
-    @CurrentUser('userId') currentUser: number,
-  ) {
-    return await this.incomeService.deleteIncome(currentUser, id);
-  }
+  // @Delete()
+  // async deleteIncome(
+  //   @Query('id') id: number,
+  //   @CurrentUser('userId') currentUser: number,
+  // ) {
+  //   return await this.incomeService.deleteIncome(currentUser, id);
+  // }
 
   @Get('export')
   async exportCsv(

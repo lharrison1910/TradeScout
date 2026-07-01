@@ -56,7 +56,6 @@ const Home = () => {
 
   const { data: income } = useGetIncome();
 
-  console.log(income);
   return (
     <>
       <Box
