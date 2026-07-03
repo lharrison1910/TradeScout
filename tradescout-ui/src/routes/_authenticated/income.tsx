@@ -1,13 +1,13 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import Home from "../../pages/Home/Home";
+import IncomePage from "../../pages/Income/Income";
 
-export const Route = createFileRoute("/_authenticated/")({
+export const Route = createFileRoute("/_authenticated/income")({
   component: () => {
     const router = useRouter();
     const { auth } = router.options.context;
 
     if (auth.user) {
-      return <Home />;
+      return <IncomePage />;
     }
   },
 });

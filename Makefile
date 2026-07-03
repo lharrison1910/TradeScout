@@ -27,13 +27,16 @@ install: install-api install-ui
 
 # docker
 
-build: 
+docker-build: 
 	docker compose build
 
-up: 
+docker-up: 
 	docker compose up -d
 
-down: 
+docker-down: 
 	docker compose down
 
-restart: down build up
+docker-restart: 
+	make docker-down 
+	make docker-build 
+	make docker-up
