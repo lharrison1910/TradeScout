@@ -15,7 +15,6 @@ import { SnapRecieptCard } from "../SnapRecieptCard/SnapRecieptCard";
 import { useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { usePostIncome } from "../../hooks/usePostIncome/usePostIncome";
-// import { IncomeBaseSchema } from "@tradescout/shared/schema/IncomeSchema";
 
 interface incomeType {
   total: number;
@@ -58,22 +57,13 @@ const IncomeModal = ({ open, handleClose }) => {
       dateReceived: form.dateReceived.toISOString(),
     };
 
-    formData.append("incomeDetails", JSON.stringify(formattedData));
+    const stringData = JSON.stringify(formattedData);
+    formData.append("incomeData", JSON.stringify(stringData));
 
-    mutate(formData);
+    console.log(formData.get("incomeData"));
+    console.log(formData.get("receipt"));
 
-    // const result = IncomeBaseSchema.safeParse(formattedData);
-
-    // if (!result.success) {
-    //   const formattedErrors: Record<string, string> = {};
-    //   result.error.issues.forEach((issue) => {
-    //     const key = String(issue.path[0] ?? "");
-    //     formattedErrors[key] = issue.message;
-    //   });
-    //   console.log(formattedErrors);
-    //   setErrors(formattedErrors);
-    //   return;
-    // }
+    // mutate(formData);
   };
 
   const style = {

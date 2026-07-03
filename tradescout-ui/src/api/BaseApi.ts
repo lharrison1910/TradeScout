@@ -4,7 +4,7 @@ export class BaseApi {
   async get(url: string) {
     const res = await fetch(`${this.url}/${url}`, {
       credentials: "include",
-    }).then((res) => res.json());
+    });
 
     if (!res.ok) {
       throw new Error(res.statusText);

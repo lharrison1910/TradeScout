@@ -19,11 +19,11 @@ export class IncomeService {
     private readonly logger: PinoLogger,
   ) {}
 
-  async getIncome(currentUser: number) {
+  async getIncome(currentUser: any) {
     let income: Income[];
     try {
       income = await this.incomeRepository.find({
-        where: { userId: currentUser },
+        where: { userId: currentUser.userId },
       });
     } catch (error) {
       this.logger.error(`getIncome - failed to get income: ${error}`);
@@ -37,18 +37,47 @@ export class IncomeService {
     return income;
   }
 
-  async addIncome(currentUser: number, payload) {
-    console.log(payload, 'this is the payload');
+  async getRecentIncome(currentUser) {
+    let income: Income[];
+    try {
+      income = await this.incomeRepository.find({
+        where: { userId: currentUser.userId },
+        order: {
+          dateReceived: 'DESC',
+        },
+        take: 2,
+      });
+    } catch (error) {
+      this.logger.error(`getIncome - failed to get income: ${error}`);
+      throw new InternalServerErrorException('Failed to get income');
+    }
+
+    if (income.length === 0) {
+      throw new NotFoundException('No income were found');
+    }
+
+    return income;
+  }
+
+  async addIncome(currentUser: any, body: string) {
+    let payload: CreateIncomeDto;
+    try {
+      payload = JSON.parse(body);
+    } catch (error) {
+      this.logger.error(`addIncome: Invalid JSON: ${error}`);
+      throw new InternalServerErrorException(`Invalid JSON`);
+    }
+
     const income = this.incomeRepository.create({
-      userId: currentUser,
+      userId: currentUser.userId,
       ...payload,
     });
 
     try {
       return await this.incomeRepository.save(income);
     } catch (error) {
-      this.logger.error(`addIncome: ${error}`);
-      throw new InternalServerErrorException('Failed to save income');
+      this.logger.error(`addIncome: Failed to save - ${error}`);
+      throw new InternalServerErrorException('Failed to save');
     }
   }
 
@@ -104,21 +133,6 @@ export class IncomeService {
     return csvRows.join('\n');
   }
 }
-
-// async addIncome(currentUser: number, payload) {
-//   console.log(payload, 'this is the payload');
-//   // const income = this.incomeRepository.create({
-//   //   userId: currentUser,
-//   //   ...payload,
-//   // });
-
-//   // try {
-//   //   return await this.incomeRepository.save(income);
-//   // } catch (error) {
-//   //   this.logger.error(`addIncome: ${error}`);
-//   //   throw new InternalServerErrorException('Failed to save income');
-//   // }
-// }
 
 // //TODO: add filters for year/date/any search functionality
 //

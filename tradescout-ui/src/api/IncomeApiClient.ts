@@ -6,6 +6,9 @@ class IncomeApiClient extends BaseApi {
 
   constructor() {
     super();
+    this.getIncome.bind(this);
+    this.getRecentIncome.bind(this);
+    this.createIncome.bind(this);
   }
 
   static getInstance(): IncomeApiClient {
@@ -17,6 +20,10 @@ class IncomeApiClient extends BaseApi {
 
   async getIncome() {
     return await this.get(this.income);
+  }
+
+  async getRecentIncome() {
+    return await this.get(`${this.income}/recents`);
   }
 
   async createIncome(payload: FormData) {

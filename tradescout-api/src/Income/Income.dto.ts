@@ -5,6 +5,7 @@ export interface CreateIncomeDto {
   dateReceived: string;
   amount: number;
   category: MtdIncomeCategory;
+  paymentMethod: string;
   isDailyTotal: boolean;
   reference: string;
 }

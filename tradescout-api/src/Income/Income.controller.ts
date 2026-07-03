@@ -9,27 +9,37 @@ import {
   Query,
   Res,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { IncomeService } from './Income.service';
 import type { CreateIncomeDto, UpdateIncomeDto } from './Income.dto';
-import { JwtAuthGuard } from '../Auth/auth.guard';
 import { CurrentUser } from '../decorator/currentUser.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '@nestjs/passport';
 
-// @UseGuards(JwtAuthGuard)
+@UseGuards(AuthGuard('jwt'))
 @Controller('income')
 export class IncomeController {
   constructor(private readonly incomeService: IncomeService) {}
 
-  @Post()
-  async addIncome(@Body() body, @CurrentUser('userId') currentUser: number) {
-    console.log(body, 'i have reached the controller');
-    return await this.incomeService.addIncome(currentUser, body);
+  @Get()
+  async getIncome(@CurrentUser() currentUser: any) {
+    return await this.incomeService.getIncome(currentUser);
   }
 
-  @Get()
-  async getIncome(@CurrentUser('userId') currentUser: number) {
-    return await this.incomeService.getIncome(currentUser);
+  @Get('recents')
+  async getRecentIncome(@CurrentUser() currentUser) {
+    return await this.incomeService.getRecentIncome(currentUser);
+  }
+
+  @Post()
+  @UseInterceptors(FileInterceptor('receipt'))
+  async addIncome(
+    @Body('incomeData') body: string,
+    @CurrentUser() currentUser: any,
+  ) {
+    return await this.incomeService.addIncome(currentUser, body);
   }
 
   // @Put()
