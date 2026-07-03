@@ -6,6 +6,7 @@ import { ExpenseModule } from './Expense/Expense.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './Auth/Auth.module';
 import { SeedModule } from './seed/seed.module';
+import { HealthModule } from './Health/Health.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { SeedModule } from './seed/seed.module';
     ExpenseModule,
     AuthModule,
     SeedModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [],

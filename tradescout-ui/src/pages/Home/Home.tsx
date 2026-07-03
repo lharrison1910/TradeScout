@@ -6,13 +6,15 @@ import {
   Button,
   List,
   ListItem,
+  CircularProgress,
 } from "@mui/material";
 import { SnapRecieptCard } from "../../components/SnapRecieptCard/SnapRecieptCard";
 import ExpenseModal from "../../components/ExpenseModal/ExpenseModal";
 import IncomeModal from "../../components/IncomeModal/IncomeModal";
 import { useState } from "react";
-import { useGetIncome } from "../../hooks/useGetIncome/useGetIncome";
 import { useAuth } from "../../hooks/useAuth/useAuth";
+import { useGetExpense } from "../../hooks/useGetExpense/useGetExpense";
+import { useGetRecentIncome } from "../../hooks/useGetRecentIncome/useGetRecentIncome";
 
 const Home = () => {
   const [expenseModal, setExpenseModal] = useState<boolean>(false);
@@ -54,9 +56,15 @@ const Home = () => {
 
   const currentQuater = getFiscalQuarter(new Date().getMonth() + 1);
 
-  const { data: income } = useGetIncome();
+  const { data: income, isLoading: incomeLoading } = useGetRecentIncome();
+  const { data: expense, isLoading: expenseLoading } = useGetExpense();
 
-  console.log(income);
+  if (incomeLoading || expenseLoading) {
+    return <CircularProgress />;
+  }
+
+  const recents = [...income, ...expense];
+
   return (
     <>
       <Box
@@ -102,6 +110,9 @@ const Home = () => {
           <Typography>Recent Activity</Typography>
           <List>
             {/*map items*/}
+            {recents.map((row) => (
+              <ListItem>{row.amount}</ListItem>
+            ))}
             <ListItem></ListItem>
           </List>
         </Paper>

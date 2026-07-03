@@ -35,6 +35,9 @@ export class Income {
   })
   category: MtdIncomeCategory;
 
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  paymentMethod: string;
+
   @Column({ type: 'boolean', default: false })
   isDailyTotal: boolean;
 

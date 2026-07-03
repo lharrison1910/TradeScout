@@ -9,46 +9,54 @@ import {
   Query,
   Res,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { IncomeService } from './Income.service';
 import type { CreateIncomeDto, UpdateIncomeDto } from './Income.dto';
-import { JwtAuthGuard } from 'src/Auth/auth.guard';
-import { CurrentUser } from 'src/decorator/currentUser.decorator';
+import { CurrentUser } from '../decorator/currentUser.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '@nestjs/passport';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(AuthGuard('jwt'))
 @Controller('income')
 export class IncomeController {
   constructor(private readonly incomeService: IncomeService) {}
 
+  @Get()
+  async getIncome(@CurrentUser() currentUser: any) {
+    return await this.incomeService.getIncome(currentUser);
+  }
+
+  @Get('recents')
+  async getRecentIncome(@CurrentUser() currentUser) {
+    return await this.incomeService.getRecentIncome(currentUser);
+  }
+
   @Post()
+  @UseInterceptors(FileInterceptor('receipt'))
   async addIncome(
-    @Body() body: CreateIncomeDto,
-    @CurrentUser('userId') currentUser: number,
+    @Body('incomeData') body: string,
+    @CurrentUser() currentUser: any,
   ) {
     return await this.incomeService.addIncome(currentUser, body);
   }
 
-  @Get()
-  async getIncome(@CurrentUser('userId') currentUser: number) {
-    return await this.incomeService.getIncome(currentUser);
-  }
+  // @Put()
+  // async updateIncome(
+  //   @Body() body: UpdateIncomeDto,
+  //   @CurrentUser('userId') currentUser: number,
+  // ) {
+  //   return await this.incomeService.updateIncome(currentUser, body.id, body);
+  // }
 
-  @Put()
-  async updateIncome(
-    @Body() body: UpdateIncomeDto,
-    @CurrentUser('userId') currentUser: number,
-  ) {
-    return await this.incomeService.updateIncome(currentUser, body.id, body);
-  }
-
-  @Delete()
-  async deleteIncome(
-    @Query('id') id: number,
-    @CurrentUser('userId') currentUser: number,
-  ) {
-    return await this.incomeService.deleteIncome(currentUser, id);
-  }
+  // @Delete()
+  // async deleteIncome(
+  //   @Query('id') id: number,
+  //   @CurrentUser('userId') currentUser: number,
+  // ) {
+  //   return await this.incomeService.deleteIncome(currentUser, id);
+  // }
 
   @Get('export')
   async exportCsv(

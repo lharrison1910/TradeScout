@@ -19,7 +19,9 @@ install-ui:
 
 # app
 
-dev: api ui
+dev:
+	make api
+	make ui
 
 install: install-api install-ui
 

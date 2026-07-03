@@ -7,13 +7,14 @@ import {
   Select,
   MenuItem,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { SnapRecieptCard } from "../SnapRecieptCard/SnapRecieptCard";
 import { useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
-// import { IncomeBaseSchema } from "@tradescout/shared/schema/IncomeSchema";
+import { usePostIncome } from "../../hooks/usePostIncome/usePostIncome";
 
 interface incomeType {
   total: number;
@@ -29,10 +30,10 @@ const IncomeModal = ({ open, handleClose }) => {
     job: 0,
     dateReceived: dayjs(),
   });
-
   const formData = new FormData();
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const { mutate, isPending, error } = usePostIncome();
 
   const closeModal = () => {
     setForm({
@@ -56,22 +57,13 @@ const IncomeModal = ({ open, handleClose }) => {
       dateReceived: form.dateReceived.toISOString(),
     };
 
-    console.log(formattedData);
+    const stringData = JSON.stringify(formattedData);
+    formData.append("incomeData", JSON.stringify(stringData));
 
-    formData.append("incomeDetails", JSON.stringify(form));
+    console.log(formData.get("incomeData"));
+    console.log(formData.get("receipt"));
 
-    // const result = IncomeBaseSchema.safeParse(formattedData);
-
-    // if (!result.success) {
-    //   const formattedErrors: Record<string, string> = {};
-    //   result.error.issues.forEach((issue) => {
-    //     const key = String(issue.path[0] ?? "");
-    //     formattedErrors[key] = issue.message;
-    //   });
-    //   console.log(formattedErrors);
-    //   setErrors(formattedErrors);
-    //   return;
-    // }
+    // mutate(formData);
   };
 
   const style = {
@@ -90,6 +82,7 @@ const IncomeModal = ({ open, handleClose }) => {
     justifyContent: "center",
     alignItems: "center",
   };
+
   return (
     <Modal open={open} onClose={closeModal}>
       <Box sx={style}>
@@ -118,6 +111,9 @@ const IncomeModal = ({ open, handleClose }) => {
           />
 
           <Typography>Client / Job Reference</Typography>
+          <TextField />
+
+          <Typography>Payment type</Typography>
           <Select
             fullWidth
             name="paymentType"

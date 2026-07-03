@@ -19,29 +19,11 @@ export class IncomeService {
     private readonly logger: PinoLogger,
   ) {}
 
-  async addIncome(
-    currentUser: number,
-    payload: CreateIncomeDto,
-  ): Promise<Income> {
-    const income = this.incomeRepository.create({
-      userId: currentUser,
-      ...payload,
-    });
-
-    try {
-      return await this.incomeRepository.save(income);
-    } catch (error) {
-      this.logger.error(`addIncome: ${error}`);
-      throw new InternalServerErrorException('Failed to save income');
-    }
-  }
-
-  //TODO: add filters for year/date/any search functionality
-  async getIncome(currentUser: number) {
+  async getIncome(currentUser: any) {
     let income: Income[];
     try {
       income = await this.incomeRepository.find({
-        where: { userId: currentUser },
+        where: { userId: currentUser.userId },
       });
     } catch (error) {
       this.logger.error(`getIncome - failed to get income: ${error}`);
@@ -55,68 +37,47 @@ export class IncomeService {
     return income;
   }
 
-  async updateIncome(
-    currentUser: number,
-    incomeId: number,
-    payload: UpdateIncomeDto,
-  ) {
-    let income: Income | null;
-
+  async getRecentIncome(currentUser) {
+    let income: Income[];
     try {
-      income = await this.incomeRepository.findOne({
-        where: { userId: currentUser, id: incomeId },
+      income = await this.incomeRepository.find({
+        where: { userId: currentUser.userId },
+        order: {
+          dateReceived: 'DESC',
+        },
+        take: 2,
       });
     } catch (error) {
-      this.logger.error(
-        `updateIncome - faied to get income ${incomeId}: ${error}`,
-      );
-      throw new InternalServerErrorException(
-        `Failed to update Income ${incomeId}`,
-      );
+      this.logger.error(`getIncome - failed to get income: ${error}`);
+      throw new InternalServerErrorException('Failed to get income');
     }
 
-    if (!income) {
-      throw new NotFoundException(`Income ${incomeId} was not found`);
+    if (income.length === 0) {
+      throw new NotFoundException('No income were found');
     }
 
-    try {
-      const updatedIncome = await this.incomeRepository.update(
-        incomeId,
-        payload,
-      );
-      return updatedIncome.affected;
-    } catch (error) {
-      this.logger.error(
-        `updateIncome - failed to update income ${incomeId}: ${error}`,
-      );
-      throw new InternalServerErrorException('Failed to update income');
-    }
+    return income;
   }
 
-  async deleteIncome(currentUser: number, id: number) {
-    let income: Income | null;
-
+  async addIncome(currentUser: any, body: string) {
+    let payload: CreateIncomeDto;
     try {
-      income = await this.incomeRepository.findOne({
-        where: { id, userId: currentUser },
-      });
+      payload = JSON.parse(body);
     } catch (error) {
-      this.logger.error(
-        `deleteIncome - failed to find ${id} to delete: ${error}`,
-      );
-      throw new InternalServerErrorException('Failed to find record to delete');
+      this.logger.error(`addIncome: Invalid JSON: ${error}`);
+      throw new InternalServerErrorException(`Invalid JSON`);
     }
 
-    if (!income) {
-      throw new NotFoundException(`Failed to find ${id} to delete`);
-    }
+    const income = this.incomeRepository.create({
+      userId: currentUser.userId,
+      ...payload,
+    });
 
     try {
-      const deleted = await this.incomeRepository.softDelete(id);
-      return deleted.affected;
+      return await this.incomeRepository.save(income);
     } catch (error) {
-      this.logger.error(`deleteIncome - failed to soft delete ${id}: ${error}`);
-      throw new InternalServerErrorException('Failed to delete Income');
+      this.logger.error(`addIncome: Failed to save - ${error}`);
+      throw new InternalServerErrorException('Failed to save');
     }
   }
 
@@ -172,3 +133,71 @@ export class IncomeService {
     return csvRows.join('\n');
   }
 }
+
+// //TODO: add filters for year/date/any search functionality
+//
+
+// async updateIncome(
+//   currentUser: number,
+//   incomeId: number,
+//   payload: UpdateIncomeDto,
+// ) {
+//   let income: Income | null;
+
+//   try {
+//     income = await this.incomeRepository.findOne({
+//       where: { userId: currentUser, id: incomeId },
+//     });
+//   } catch (error) {
+//     this.logger.error(
+//       `updateIncome - faied to get income ${incomeId}: ${error}`,
+//     );
+//     throw new InternalServerErrorException(
+//       `Failed to update Income ${incomeId}`,
+//     );
+//   }
+
+//   if (!income) {
+//     throw new NotFoundException(`Income ${incomeId} was not found`);
+//   }
+
+//   try {
+//     const updatedIncome = await this.incomeRepository.update(
+//       incomeId,
+//       payload,
+//     );
+//     return updatedIncome.affected;
+//   } catch (error) {
+//     this.logger.error(
+//       `updateIncome - failed to update income ${incomeId}: ${error}`,
+//     );
+//     throw new InternalServerErrorException('Failed to update income');
+//   }
+// }
+
+// async deleteIncome(currentUser: number, id: number) {
+//   let income: Income | null;
+
+//   try {
+//     income = await this.incomeRepository.findOne({
+//       where: { id, userId: currentUser },
+//     });
+//   } catch (error) {
+//     this.logger.error(
+//       `deleteIncome - failed to find ${id} to delete: ${error}`,
+//     );
+//     throw new InternalServerErrorException('Failed to find record to delete');
+//   }
+
+//   if (!income) {
+//     throw new NotFoundException(`Failed to find ${id} to delete`);
+//   }
+
+//   try {
+//     const deleted = await this.incomeRepository.softDelete(id);
+//     return deleted.affected;
+//   } catch (error) {
+//     this.logger.error(`deleteIncome - failed to soft delete ${id}: ${error}`);
+//     throw new InternalServerErrorException('Failed to delete Income');
+//   }
+// }
