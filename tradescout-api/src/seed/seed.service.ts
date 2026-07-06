@@ -8,6 +8,7 @@ import { DataSource, Repository } from 'typeorm';
 import { generateMockUsers } from './mockUsers';
 import { mockIncomeData } from './mockIncome';
 import { mockExpenseData } from './mockExpense';
+import { Business } from 'src/Business/Business.entity';
 
 @Injectable()
 export class SeedService {
@@ -39,6 +40,7 @@ export class SeedService {
         const userRepository = em.getRepository(User);
         const incomeRepository = em.getRepository(Income);
         const expenseRepository = em.getRepository(Expense);
+        const businessRepository = em.getRepository(Business);
 
         const usersToSave = userRepository.create(mockedUsers);
         const users = await userRepository.save(usersToSave);
@@ -51,7 +53,6 @@ export class SeedService {
             userId: randomUser.id,
           };
         });
-
         const incomeToSave = incomeRepository.create(incomeWithUser);
         await incomeRepository.save(incomeToSave);
         this.logger.info('Saved income');
@@ -64,7 +65,6 @@ export class SeedService {
             userId: randomUser.id,
           };
         });
-
         const expenseToSave = expenseRepository.create(expenseWithUser);
         await expenseRepository.save(expenseToSave);
         this.logger.info('Saved expense');

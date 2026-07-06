@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './Auth/Auth.module';
 import { SeedModule } from './seed/seed.module';
 import { HealthModule } from './Health/Health.module';
+import { BuisnessModule } from './Business/Business.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { HealthModule } from './Health/Health.module';
     AuthModule,
     SeedModule,
     HealthModule,
+    BuisnessModule,
   ],
   controllers: [],
   providers: [],
