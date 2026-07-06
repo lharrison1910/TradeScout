@@ -7,47 +7,60 @@ import {
   Select,
   MenuItem,
   Divider,
-  CircularProgress,
 } from "@mui/material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { SnapRecieptCard } from "../SnapRecieptCard/SnapRecieptCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { usePostIncome } from "../../hooks/usePostIncome/usePostIncome";
+import { useAuth } from "../../hooks/useAuth/useAuth";
 
 interface incomeType {
-  total: number;
-  paymentType: string;
-  job: number;
+  amount: number;
+  paymentMethod: string;
+  jobReference: string;
   dateReceived: Dayjs;
 }
 
 const IncomeModal = ({ open, handleClose, data }) => {
+  const { user } = useAuth();
   const [form, setForm] = useState<incomeType>({
-    total: 0,
-    paymentType: "Bank Transfer",
-    job: 0,
+    amount: 0,
+    paymentMethod: "Bank Transfer",
+    jobReference: "",
     dateReceived: dayjs(),
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { mutate, isPending } = usePostIncome();
   const formData = new FormData();
 
-  if (data) {
-    setForm(data);
-  }
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const { mutate, isPending, error } = usePostIncome();
+  useEffect(() => {
+    if (data) {
+      setForm({
+        amount: Number(data.amount) || 0,
+        paymentMethod: data.paymentMethod || "Bank Transfer",
+        jobReference: data.jobReference || "",
+        dateReceived: data.dateReceived ? dayjs(data.dateReceived) : dayjs(),
+      });
+    } else {
+      setForm({
+        amount: 0,
+        paymentMethod: "Bank Transfer",
+        jobReference: "",
+        dateReceived: dayjs(),
+      });
+    }
+  }, [data, open]);
 
   const closeModal = () => {
     setForm({
-      total: 0,
-      paymentType: "Bank Transfer",
-      job: 0,
+      amount: 0,
+      paymentMethod: "Bank Transfer",
+      jobReference: "",
       dateReceived: dayjs(),
     });
     setErrors({});
-
     handleClose();
   };
 
@@ -61,13 +74,9 @@ const IncomeModal = ({ open, handleClose, data }) => {
       dateReceived: form.dateReceived.toISOString(),
     };
 
-    const stringData = JSON.stringify(formattedData);
-    formData.append("incomeData", JSON.stringify(stringData));
+    formData.append("incomeData", JSON.stringify(formattedData));
 
-    console.log(formData.get("incomeData"));
-    console.log(formData.get("receipt"));
-
-    // mutate(formData);
+    mutate(formData);
   };
 
   const style = {
@@ -80,7 +89,6 @@ const IncomeModal = ({ open, handleClose, data }) => {
     border: "2px solid #000",
     boxShadow: 24,
     p: 4,
-
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
@@ -90,42 +98,66 @@ const IncomeModal = ({ open, handleClose, data }) => {
   return (
     <Modal open={open} onClose={closeModal}>
       <Box sx={style}>
-        <Box>
+        <Box
+          sx={{
+            width: "100%",
+            position: "relative",
+            textAlign: "center",
+            mb: 2,
+          }}
+        >
           <Button
             onClick={closeModal}
             size="small"
-            sx={{ position: "absolute", left: 10, top: 5 }}
+            sx={{ position: "absolute", left: -20, top: -5 }}
           >
             Back
           </Button>
-          <Typography>New Income</Typography>
+          <Typography variant="h6">
+            {data ? "Edit Income" : "New Income"}
+          </Typography>
         </Box>
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <Typography>Totla Received (£)</Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            width: "100%",
+          }}
+        >
+          <Typography>Business</Typography>
+          <TextField value={user.name} />
+          <Typography variant="body2">Total Received (£)</Typography>
           <TextField
             type="number"
-            name="total"
-            value={form.total}
+            name="amount"
+            value={form.amount}
             onChange={(event) =>
               handleChange(event.target.name, Number(event.target.value))
             }
-            error={!!errors.total}
-            helperText={errors.total}
+            error={!!errors.amount}
+            helperText={errors.amount}
           />
 
-          <Typography>Client / Job Reference</Typography>
-          <TextField />
+          <Typography variant="body2">Client / Job Reference</Typography>
 
-          <Typography>Payment type</Typography>
-          <Select
-            fullWidth
-            name="paymentType"
-            value={form.paymentType}
+          <TextField
+            name="jobReference"
+            value={form.jobReference}
             onChange={(event) =>
               handleChange(event.target.name, event.target.value)
             }
-            error={!!errors.paymentType}
+          />
+
+          <Typography variant="body2">Payment type</Typography>
+          <Select
+            fullWidth
+            name="paymentMethod"
+            value={form.paymentMethod}
+            onChange={(event) =>
+              handleChange(event.target.name, event.target.value)
+            }
           >
             <MenuItem value={"Bank Transfer"}>Bank Transfer</MenuItem>
             <MenuItem value={"Cash"}>Cash</MenuItem>
@@ -133,10 +165,9 @@ const IncomeModal = ({ open, handleClose, data }) => {
             <MenuItem value={"Cheque"}>Cheque</MenuItem>
           </Select>
 
-          <Typography>Date Recieved</Typography>
+          <Typography variant="body2">Date Received</Typography>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DateTimePicker
-              name="dateReceived"
               value={form.dateReceived}
               onChange={(newValue) => handleChange("dateReceived", newValue)}
             />
@@ -147,16 +178,21 @@ const IncomeModal = ({ open, handleClose, data }) => {
             <SnapRecieptCard
               title="Snap Income"
               handleFormChange={(file) => {
-                formData.append("proof", file);
+                formData.append("receipt", file);
               }}
             />
           </Box>
         </Box>
-        <Box>
-          <Button color="success" onClick={handleSave}>
+        <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
+          <Button
+            disabled={isPending}
+            color="success"
+            variant="contained"
+            onClick={handleSave}
+          >
             Save
           </Button>
-          <Button color="error" onClick={closeModal}>
+          <Button color="error" variant="outlined" onClick={closeModal}>
             Cancel
           </Button>
         </Box>
@@ -166,31 +202,3 @@ const IncomeModal = ({ open, handleClose, data }) => {
 };
 
 export default IncomeModal;
-
-// +---------------------------------------------------+
-// |  [< Back]               Log Income                |
-// +---------------------------------------------------+
-// |                                                   |
-// |  Total Received (£):                              |
-// |  [  850.00                                     ]  |
-// |                                                   |
-// |  Client / Job Reference (Required):               |
-// |  [  Mrs. Smith - Bathroom Fit                  ]  |
-// |                                                   |
-// |  Payment Method:                                  |
-// |  [ Bank Transfer v ]                              |
-// |  (Options: Bank, Cash, Card Reader, Cheque)       |
-// |                                                   |
-// |  Date Received:                                   |
-// |  [  06 / 06 / 2026                           📅]  |
-// |                                                   |
-// |  -----------------------------------------------  |
-// |                                                   |
-// |  [ 📎 Attach Invoice Photo (Optional) ]           |
-// |                                                   |
-// |                                                   |
-// |  +---------------------------------------------+  |
-// |  |           SAVE INCOME TO LEDGER             |  |
-// |  +---------------------------------------------+  |
-// |                                                   |
-// +---------------------------------------------------+

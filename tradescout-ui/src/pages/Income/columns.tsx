@@ -1,39 +1,59 @@
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import type { GridColDef } from "@mui/x-data-grid";
-import { type ReactElement, useState } from "react";
+import { useState } from "react";
 import { MoreVertOutlined } from "@mui/icons-material";
 
-export const columns = (): GridColDef[] => [
+const ActionMenu = ({ params, editIncome, openDeleteModal }) => {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => setAnchorEl(null);
+
+  return (
+    <>
+      <IconButton onClick={handleClick}>
+        <MoreVertOutlined />
+      </IconButton>
+      <Menu open={open} onClose={handleClose} anchorEl={anchorEl}>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            editIncome(params.row);
+          }}
+        >
+          Edit
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            openDeleteModal();
+          }}
+        >
+          Delete
+        </MenuItem>
+      </Menu>
+    </>
+  );
+};
+
+export const columns = (openDeleteModal, editIncome): GridColDef[] => [
   {
     field: "actions",
     headerName: "",
     sortable: false,
     hideable: false,
-    renderCell: () => {
-      const [anchorEl, setAnchorEl] = useState<ReactElement | null>(null);
-      const open = Boolean(anchorEl);
-
-      const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-      };
-
-      const handleClose = () => setAnchorEl(null);
-
-      return (
-        <>
-          <IconButton onClick={handleClick}>
-            <MoreVertOutlined />
-          </IconButton>
-          <Menu open={open} onClose={handleClose} anchorEl={anchorEl}>
-            <MenuItem onClick={(params) => console.log(params.row)}>
-              Edit
-            </MenuItem>
-            <MenuItem>Delete</MenuItem>
-          </Menu>
-        </>
-      );
-    },
     maxWidth: 20,
+    renderCell: (params) => (
+      <ActionMenu
+        params={params}
+        editIncome={editIncome}
+        openDeleteModal={openDeleteModal}
+      />
+    ),
   },
   {
     field: "dateReceived",

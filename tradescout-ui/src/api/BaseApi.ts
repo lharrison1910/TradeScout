@@ -14,20 +14,14 @@ export class BaseApi {
   }
 
   async post(url: string, body: string | FormData) {
-    const baseFetchOptions = {
+    const fetchOptions: RequestInit = {
       method: "POST",
       body,
       credentials: "include",
     };
-    let fetchOptions;
-
     if (typeof body === "string") {
-      fetchOptions = {
-        ...baseFetchOptions,
-        headers: { "Content-Type": "application/json" },
-      };
+      fetchOptions.headers = { "Content-Type": "application/json" };
     }
-
     const res = await fetch(`${this.url}/${url}`, fetchOptions);
 
     if (!res.ok) {
