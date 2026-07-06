@@ -8,7 +8,11 @@ import {
   MenuItem,
   Divider,
 } from "@mui/material";
-import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import {
+  DatePicker,
+  DateTimePicker,
+  LocalizationProvider,
+} from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { SnapRecieptCard } from "../SnapRecieptCard/SnapRecieptCard";
 import { useState, useEffect } from "react";
@@ -167,7 +171,7 @@ const IncomeModal = ({ open, handleClose, data }) => {
 
           <Typography variant="body2">Date Received</Typography>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DateTimePicker
+            <DatePicker
               value={form.dateReceived}
               onChange={(newValue) => handleChange("dateReceived", newValue)}
             />
