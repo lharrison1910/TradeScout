@@ -6,7 +6,21 @@ interface GridProps {
 }
 
 const Grid = ({ columns, rows }: GridProps) => {
-  return <DataGrid columns={columns} rows={rows} checkboxSelection />;
+  return (
+    <DataGrid
+      columns={columns}
+      rows={rows}
+      disableRowSelectionOnClick
+      initialState={{
+        pagination: {
+          paginationModel: {
+            pageSize: 5,
+          },
+        },
+      }}
+      pageSizeOptions={[5]}
+    />
+  );
 };
 
 export default Grid;

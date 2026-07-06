@@ -1,40 +1,21 @@
-import {
-  Box,
-  CircularProgress,
-  IconButton,
-  Menu,
-  MenuItem,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-} from "@mui/material";
+import { Box, Button, CircularProgress } from "@mui/material";
 import { useGetIncome } from "../../hooks/useGetIncome/useGetIncome";
-import { useState } from "react";
 import Grid from "../../components/Grid/Grid";
 import { columns } from "./columns";
 
-const ActionMenu = ({ open, handleClose }) => {
-  return (
-    <Menu open={open} onClose={handleClose}>
-      <MenuItem>Edit</MenuItem>
-      <MenuItem>Delete</MenuItem>
-    </Menu>
-  );
-};
-
 const IncomePage = () => {
   const { data: income, isLoading } = useGetIncome();
-  const [menuOpen, setMenuOpen] = useState<boolean>(false);
 
   if (isLoading) {
     return <CircularProgress />;
   }
   return (
     <>
-      <Box>
-        <Grid columns={columns()} rows={income} />
+      <Box sx={{ display: "flex", width: "100%", height: "100%" }}>
+        <Box sx={{ width: "50%", maxHeight: "50%" }}>
+          <Grid columns={columns()} rows={income} />
+        </Box>
+        <Button>Export this Quarter</Button>
       </Box>
     </>
   );
