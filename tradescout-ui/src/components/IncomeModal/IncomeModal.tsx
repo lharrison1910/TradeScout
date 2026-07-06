@@ -23,7 +23,7 @@ interface incomeType {
   dateReceived: Dayjs;
 }
 
-const IncomeModal = ({ open, handleClose }) => {
+const IncomeModal = ({ open, handleClose, data }) => {
   const [form, setForm] = useState<incomeType>({
     total: 0,
     paymentType: "Bank Transfer",
@@ -31,6 +31,10 @@ const IncomeModal = ({ open, handleClose }) => {
     dateReceived: dayjs(),
   });
   const formData = new FormData();
+
+  if (data) {
+    setForm(data);
+  }
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { mutate, isPending, error } = usePostIncome();
