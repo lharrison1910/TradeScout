@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedIncomeRouteImport } from './routes/_authenticated/income'
+import { Route as AuthenticatedExpenseRouteImport } from './routes/_authenticated/expense'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -28,39 +30,57 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedIncomeRoute = AuthenticatedIncomeRouteImport.update({
   id: '/income',
   path: '/income',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedExpenseRoute = AuthenticatedExpenseRouteImport.update({
+  id: '/expense',
+  path: '/expense',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
+  '/expense': typeof AuthenticatedExpenseRoute
   '/income': typeof AuthenticatedIncomeRoute
+  '/settings': typeof AuthenticatedSettingsRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/expense': typeof AuthenticatedExpenseRoute
   '/income': typeof AuthenticatedIncomeRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/expense': typeof AuthenticatedExpenseRoute
   '/_authenticated/income': typeof AuthenticatedIncomeRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/income'
+  fullPaths: '/' | '/login' | '/expense' | '/income' | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/income' | '/'
+  to: '/login' | '/expense' | '/income' | '/settings' | '/'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/expense'
     | '/_authenticated/income'
+    | '/_authenticated/settings'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
@@ -92,6 +112,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/income': {
       id: '/_authenticated/income'
       path: '/income'
@@ -99,16 +126,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIncomeRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/expense': {
+      id: '/_authenticated/expense'
+      path: '/expense'
+      fullPath: '/expense'
+      preLoaderRoute: typeof AuthenticatedExpenseRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedExpenseRoute: typeof AuthenticatedExpenseRoute
   AuthenticatedIncomeRoute: typeof AuthenticatedIncomeRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedExpenseRoute: AuthenticatedExpenseRoute,
   AuthenticatedIncomeRoute: AuthenticatedIncomeRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
