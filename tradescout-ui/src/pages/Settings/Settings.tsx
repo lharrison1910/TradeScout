@@ -3,10 +3,17 @@ import {
   Button,
   CircularProgress,
   Divider,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
 import { useGetUser } from "../../hooks/useGetUser/useGetUser";
+import { Delete, Edit } from "@mui/icons-material";
 
 const Settings = () => {
   const { data: user, isFetching } = useGetUser();
@@ -45,12 +52,38 @@ const Settings = () => {
         <Divider />
         <Box sx={{ m: 2 }}>
           <Typography variant="h3">Business details</Typography>
-
-          <Typography>Name</Typography>
-          <TextField />
-
-          <Typography>Tax Reference</Typography>
-          <TextField />
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Tax reference</TableCell>
+                <TableCell>Edit</TableCell>
+                <TableCell>Delete</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {user.businesses.map((business) => (
+                <TableRow key={business.id}>
+                  <TableCell>
+                    <TextField value={business.name} />
+                  </TableCell>
+                  <TableCell>
+                    <TextField value={business.taxReference} />
+                  </TableCell>
+                  <TableCell>
+                    <IconButton>
+                      <Edit />
+                    </IconButton>
+                  </TableCell>
+                  <TableCell>
+                    <IconButton>
+                      <Delete />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </Box>
       </Box>
     </>
