@@ -1,3 +1,4 @@
+import { Business } from 'src/Business/Business.entity';
 import { Expense } from 'src/Expense/Expense.entity';
 import { Income } from 'src/Income/Income.entity';
 import {
@@ -53,4 +54,7 @@ export class User {
 
   @OneToMany(() => Income, (income) => income.user)
   incomes: Income[];
+
+  @OneToMany(() => Business, (business) => business.user)
+  businesses: Business[];
 }

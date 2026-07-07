@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { MtdIncomeCategory } from './IncomeCategory';
 import { User } from 'src/User/User.entity';
+import { Business } from 'src/Business/Business.entity';
 
 @Entity('Income')
 export class Income {
@@ -56,4 +57,8 @@ export class Income {
   @ManyToOne(() => User, (user) => user.incomes, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
+
+  @ManyToOne(() => Business, (business) => business.income)
+  @JoinColumn({ name: 'businessId' })
+  business: Business;
 }
