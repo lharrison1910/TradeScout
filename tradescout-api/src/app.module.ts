@@ -8,6 +8,7 @@ import { AuthModule } from './Auth/Auth.module';
 import { SeedModule } from './seed/seed.module';
 import { HealthModule } from './Health/Health.module';
 import { BuisnessModule } from './Business/Business.module';
+import { UserModule } from './User/User.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { BuisnessModule } from './Business/Business.module';
     SeedModule,
     HealthModule,
     BuisnessModule,
+    UserModule,
   ],
   controllers: [],
   providers: [],
