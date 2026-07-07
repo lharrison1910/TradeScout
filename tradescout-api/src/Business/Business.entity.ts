@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -16,11 +17,11 @@ export class Business {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   name: string;
 
-  @Column({ nullable: true })
-  taxReference: string;
+  @Column({ type: 'varchar', nullable: true })
+  taxReference?: string | null;
 
   @Column()
   userId: number;
@@ -34,12 +35,12 @@ export class Business {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @OneToMany(() => Income, (income) => income.businessId)
+  @OneToMany(() => Income, (income) => income.business)
   income: Income[];
 
-  @OneToMany(() => Expense, (expense) => expense.businessId)
+  @OneToMany(() => Expense, (expense) => expense.business)
   expense: Expense[];
 
-  @OneToMany(() => User, (user) => user.businesses)
+  @ManyToOne(() => User, (user) => user.businesses)
   user: User;
 }

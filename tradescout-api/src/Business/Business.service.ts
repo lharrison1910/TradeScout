@@ -18,7 +18,7 @@ export class BusinessService {
     let business: Business | Business[] | null;
     const findOptions = { userId: currentUser.userId };
     if (businessId) {
-      findOptions.id = businessid;
+      findOptions['id'] = businessId;
     }
     try {
       business = await this.businessRepository.find({
