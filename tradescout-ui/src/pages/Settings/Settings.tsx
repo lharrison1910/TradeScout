@@ -13,16 +13,43 @@ import {
   Typography,
 } from "@mui/material";
 import { useGetUser } from "../../hooks/useGetUser/useGetUser";
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete, Edit, Save } from "@mui/icons-material";
+import { useState } from "react";
+import { passwordCheck } from "../../utils/passwordChecks";
 
 const Settings = () => {
   const { data: user, isFetching } = useGetUser();
+
+  const [businessRowLock, setBusinessRowLock] = useState<string | undefined>();
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+
+  const handleNewPasswordChange = (value: string) => {
+    setNewPassword(value);
+  };
+
+  const handleConfirmPasswordChange = (value: string) => {
+    if (value !== newPassword) {
+      console.log("need to match");
+    }
+    setConfirmPassword(value);
+  };
+
+  const handleSavePasswordChange = () => {
+    if (newPassword !== confirmPassword) {
+      console.log("passwords not match");
+    }
+    if (!passwordCheck(newPassword)) {
+      console.log("password not meet requirements");
+    }
+
+    //send request
+  };
 
   if (isFetching) {
     return <CircularProgress />;
   }
 
-  console.log(user);
   return (
     <>
       <Box
@@ -45,8 +72,18 @@ const Settings = () => {
           {/* linked accounts */}
 
           <Typography>Change Password</Typography>
-          <TextField placeholder="current password" />
-          <TextField placeholder="new password" />
+          <TextField
+            placeholder="New Password"
+            value={newPassword}
+            onChange={(event) => handleNewPasswordChange(event.target.value)}
+          />
+          <TextField
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(event) =>
+              handleConfirmPasswordChange(event.target.value)
+            }
+          />
           <Button>Save</Button>
         </Box>
         <Divider />
@@ -65,13 +102,19 @@ const Settings = () => {
               {user.businesses.map((business) => (
                 <TableRow key={business.id}>
                   <TableCell>
-                    <TextField value={business.name} />
+                    <TextField
+                      value={business.name}
+                      disabled={businessRowLock !== business.id}
+                    />
                   </TableCell>
                   <TableCell>
-                    <TextField value={business.taxReference} />
+                    <TextField
+                      value={business.taxReference}
+                      disabled={businessRowLock !== business.id}
+                    />
                   </TableCell>
                   <TableCell>
-                    <IconButton>
+                    <IconButton onClick={() => setBusinessRowLock(business.id)}>
                       <Edit />
                     </IconButton>
                   </TableCell>
