@@ -46,9 +46,9 @@ const UserSection = ({ user }) => {
   };
 
   return (
-    <Stack sx={{ m: 2, gap: 1 }}>
+    <Stack sx={{ m: 2, gap: 2, alignItems: "center" }}>
       <Typography variant="h3">Your details</Typography>
-      <Box>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <Box>
           <Typography>Email</Typography>
           <TextField
@@ -81,7 +81,6 @@ const UserSection = ({ user }) => {
         </>
       )}
 
-      <Typography>Change Password</Typography>
       <Box>
         <Box>
           <TextField
