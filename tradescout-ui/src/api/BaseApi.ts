@@ -40,7 +40,7 @@ export class BaseApi {
   async put(url: string, body: string) {
     const res = await fetch(`${this.url}/${url}`, {
       method: "PUT",
-      headers: {},
+      headers: { "Content-Type": "application/json" },
       body: body,
       credentials: "include",
     });

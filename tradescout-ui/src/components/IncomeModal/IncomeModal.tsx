@@ -64,9 +64,6 @@ const IncomeModal = ({ open, handleClose, data }) => {
     const stringData = JSON.stringify(formattedData);
     formData.append("incomeData", JSON.stringify(stringData));
 
-    console.log(formData.get("incomeData"));
-    console.log(formData.get("receipt"));
-
     // mutate(formData);
   };
 

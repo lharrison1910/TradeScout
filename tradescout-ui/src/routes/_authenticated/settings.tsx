@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import Settings from "../../pages/Settings/settings";
+import Settings from "../../pages/Settings/Settings";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   component: () => {

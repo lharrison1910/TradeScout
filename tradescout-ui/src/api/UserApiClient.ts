@@ -34,6 +34,12 @@ class UserApiClient extends BaseApi {
   async getUser() {
     return await this.get(`${this.user}`);
   }
+
+  async updateUser(payload) {
+    const body = JSON.stringify(payload);
+    return await this.put(`${this.user}`, body);
+  }
+
 }
 
 export const userApiClient = UserApiClient.getInstance();
