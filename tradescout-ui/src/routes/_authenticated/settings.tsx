@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import Settings from "../../pages/Settings/Settings";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   component: () => {
@@ -6,7 +7,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
     const { auth } = router.options.context;
 
     if (auth.user) {
-      return <>Settings</>;
+      return <Settings />;
     }
   },
 });

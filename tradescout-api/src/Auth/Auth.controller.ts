@@ -58,18 +58,13 @@ export class AuthController {
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  async googleAuth(@Req() _req: Request) {
-    // Passport automatically redirects the user to Google here
-  }
+  async googleAuth(@Req() _req: Request) {}
 
-  // Step 2: Google redirects back to this route with the user data
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req: any, @Res() res: Response) {
-    // 1. req.user contains the data returned by our GoogleStrategy validate() method
     const user = await this.authService.validateGoogleUser(req.user);
 
-    // 2. Generate your standard JWT (reuse your existing logic here)
     const jwtToken = this.authService.generateJwt({
       sub: user.id,
       email: user.email,
@@ -82,7 +77,6 @@ export class AuthController {
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     });
 
-    // 4. Redirect the user back to the React frontend dashboard
     const frontendUrl = this.configService.get<string>('FRONTEND_URL');
     return res.redirect(`${frontendUrl}/dashboard`);
   }

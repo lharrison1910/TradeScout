@@ -3,6 +3,7 @@ import { BaseApi } from "./BaseApi";
 
 class UserApiClient extends BaseApi {
   private readonly auth = "auth";
+  private readonly user = "user";
   private static instance: UserApiClient;
 
   constructor() {
@@ -29,6 +30,16 @@ class UserApiClient extends BaseApi {
   async googleLogin() {
     return await this.get(`${this.auth}/google`);
   }
+
+  async getUser() {
+    return await this.get(`${this.user}`);
+  }
+
+  async updateUser(payload) {
+    const body = JSON.stringify(payload);
+    return await this.put(`${this.user}`, body);
+  }
+
 }
 
 export const userApiClient = UserApiClient.getInstance();
