@@ -1,5 +1,6 @@
 import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
 import Navbar from "../components/Navbar/Navbar";
+import "./_authenticated.css";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: ({ context }) => {
@@ -10,9 +11,9 @@ export const Route = createFileRoute("/_authenticated")({
     }
   },
   component: () => (
-    <>
+    <div className="App">
       <Navbar />
       <Outlet />
-    </>
+    </div>
   ),
 });

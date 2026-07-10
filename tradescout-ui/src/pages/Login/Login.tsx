@@ -1,10 +1,5 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, CircularProgress, TextField, Typography } from "@mui/material";
+import Button from "../../components/Button/Button";
 import { useLogin } from "../../hooks/User/useLogin/useLogin";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth/useAuth";
@@ -55,11 +50,13 @@ const Login = () => {
           flexDirection: "column",
           alignItems: "center",
           boxShadow: 4,
-          width: "20%",
+          width: "30%",
           padding: 2,
           margin: 2,
+          gap: 2,
         }}
       >
+        <Typography variant="h5">Welcome to TradeScout</Typography>
         <Box>
           <Typography>Email</Typography>
           <TextField
@@ -76,14 +73,14 @@ const Login = () => {
             value={loginForm.password}
           />
         </Box>
-        <Button onClick={handleLogin}>Login</Button>
+        <Button onClick={handleLogin} title="Login" />
       </Box>
 
       <Box>
-        <Button onClick={handleGoogleLogin}>Sign in with google</Button>
+        <Button onClick={handleGoogleLogin} title="Sign in with google" />
       </Box>
 
-      <Button>Create account</Button>
+      <Button title="Create Account" onClick={() => {}} />
     </>
   );
 };

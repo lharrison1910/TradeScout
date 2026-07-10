@@ -1,6 +1,7 @@
 import { ArrowBack } from "@mui/icons-material";
-import { Box, Button, Dialog, DialogContent, DialogTitle } from "@mui/material";
+import { Box, Dialog, DialogContent, DialogTitle } from "@mui/material";
 import type { FC, PropsWithChildren } from "react";
+import Button from "../Button/Button";
 
 interface ModalProps {
   open: boolean;
@@ -22,20 +23,30 @@ const Modal: FC<PropsWithChildren<ModalProps>> = ({
 
   return (
     <Dialog open={open} onClose={closeModal}>
-      <DialogTitle>{title}</DialogTitle>
-      <DialogContent>
+      <DialogTitle>
         <Button
+          title="Back"
           startIcon={<ArrowBack />}
           onClick={closeModal}
           size="small"
-          sx={{ position: "absolute", left: 10, top: 5 }}
-        >
-          Back
-        </Button>
+          sx={{ marginRight: 1 }}
+          // sx={{ position: "absolute", left: 10, top: 5 }}
+        />
+        {title}
+      </DialogTitle>
+      <DialogContent>
         <Box>{children}</Box>
-        <Box>
-          <Button onClick={handleSave}>Save</Button>
-          <Button>Cancel</Button>
+
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            justifyContent: "space-around",
+            marginTop: 1,
+          }}
+        >
+          <Button title="Save" onClick={handleSave} />
+          <Button title="Cancel" onClick={handleClose} />
         </Box>
       </DialogContent>
     </Dialog>

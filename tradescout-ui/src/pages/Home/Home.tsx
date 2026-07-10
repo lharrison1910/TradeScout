@@ -3,7 +3,6 @@ import {
   Paper,
   Typography,
   LinearProgress,
-  Button,
   List,
   ListItem,
   CircularProgress,
@@ -15,6 +14,7 @@ import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth/useAuth";
 import { useGetExpense } from "../../hooks/useGetExpense/useGetExpense";
 import { useGetRecentIncome } from "../../hooks/useGetRecentIncome/useGetRecentIncome";
+import Button from "../../components/Button/Button";
 
 const Home = () => {
   const [expenseModal, setExpenseModal] = useState<boolean>(false);
@@ -72,7 +72,6 @@ const Home = () => {
           display: "flex",
           flexDirection: "column",
           gap: 4,
-          height: "100%",
         }}
       >
         <Paper
@@ -81,6 +80,7 @@ const Home = () => {
             flexDirection: "column",
             height: "15%",
             justifyContent: "space-around",
+            padding: 1,
           }}
         >
           <Typography variant="h2">Hello {user.name}!</Typography>
@@ -95,15 +95,16 @@ const Home = () => {
           </Typography>
         </Paper>
 
-        <Paper>
-          <Typography>Log expense</Typography>
+        <Paper sx={{ padding: 2 }}>
           <SnapRecieptCard
             title="Snap Reciept"
             handleFormChange={(formData) => console.log(formData)}
           />
-          <Button onClick={() => setIncomeModal(true)}>Log Income</Button>
-          <Button>Log Expense</Button>
-          <Button>Pending (3)</Button>
+          <Box sx={{ display: "flex", gap: 1, margin: 2 }}>
+            <Button onClick={() => setIncomeModal(true)} title="Log Income" />
+            <Button title="Log Expense" onClick={() => setExpenseModal(true)} />
+            <Button title={`Pending (${3})`} onClick={() => {}} />
+          </Box>
         </Paper>
 
         <Paper>
@@ -125,6 +126,7 @@ const Home = () => {
       <IncomeModal
         open={incomeModal}
         handleClose={() => setIncomeModal(false)}
+        data={undefined}
       />
     </>
   );

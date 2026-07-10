@@ -1,6 +1,8 @@
 import {
   AccountCircle,
+  DarkMode,
   Home,
+  LightMode,
   Logout,
   Settings,
   TrendingDown,
@@ -9,17 +11,19 @@ import {
 import {
   AppBar,
   Box,
-  Button,
   IconButton,
   Menu,
   MenuItem,
   Typography,
 } from "@mui/material";
+import Button from "../../components/Button/Button";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useTheme } from "../../hooks/useTheme/useTheme";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { toggleTheme, mode } = useTheme();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
 
@@ -50,14 +54,14 @@ const Navbar = () => {
     >
       <Box>
         <Button
+          title="Home"
           sx={{ color: "white" }}
           onClick={() => navigate({ to: "/" })}
           endIcon={<Home />}
-        >
-          Home
-        </Button>
+        />
 
         <Button
+          title="Income"
           sx={{ color: "white" }}
           onClick={() =>
             navigate({
@@ -65,21 +69,22 @@ const Navbar = () => {
             })
           }
           endIcon={<TrendingUp />}
-        >
-          Income
-        </Button>
+        />
+
         <Button
+          title="Expense"
           sx={{ color: "white" }}
           onClick={() => navigate({ to: "/expense" })}
           endIcon={<TrendingDown />}
-        >
-          Expenses
-        </Button>
+        />
       </Box>
 
       <Typography>TradeScout</Typography>
 
       <Box>
+        <IconButton onClick={() => toggleTheme()}>
+          {mode === "light" ? <LightMode /> : <DarkMode />}
+        </IconButton>
         <IconButton onClick={handleOpen}>
           <AccountCircle />
         </IconButton>
