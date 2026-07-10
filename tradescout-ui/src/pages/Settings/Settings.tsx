@@ -15,12 +15,10 @@ const Settings = () => {
       <Box
         sx={{
           width: "100%",
-          height: "100%",
           display: "flex",
+          marginTop: 2,
           flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 2,
+          alignItems: "flex-start",
         }}
       >
         <Paper>

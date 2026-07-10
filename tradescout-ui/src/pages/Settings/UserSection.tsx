@@ -46,7 +46,7 @@ const UserSection = ({ user }) => {
   };
 
   return (
-    <Stack sx={{ m: 2, gap: 2, alignItems: "center" }}>
+    <Stack sx={{ m: 2, gap: 2 }}>
       <Typography variant="h3">Your details</Typography>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <Box>
