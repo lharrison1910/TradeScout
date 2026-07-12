@@ -43,13 +43,14 @@ const Navbar = () => {
 
   return (
     <AppBar
+      position="static"
       sx={{
         display: "flex",
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
         padding: 2,
-        mb: 4,
+        marginBottom: 2,
       }}
     >
       <Box>

@@ -36,6 +36,30 @@ export class BusinessService {
     return business;
   }
 
+  async getRecentBusinessTransactions(currentUser) {
+    const { userId, businessId } = currentUser;
+
+    const business = await this.businessRepository
+      .createQueryBuilder('business')
+      .leftJoinAndSelect('business.income', 'income')
+      .leftJoinAndSelect('business.expense', 'expense')
+      .where('business.id = :businessId', { businessId })
+      .andWhere('business.userId = :userId', { userId })
+
+      .orderBy('COALESCE(income.updatedAt, income.createdAt)', 'DESC')
+      .addOrderBy('COALESCE(expense.updatedAt, expense.createdAt)', 'DESC')
+
+      .getOne();
+
+    if (!business) {
+      throw new NotFoundException(
+        'Business dashboard data could not be found.',
+      );
+    }
+
+    return business;
+  }
+
   async addBusiness(currentUser, payload) {
     try {
       const businessToSave = this.businessRepository.create({

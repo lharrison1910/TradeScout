@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated")({
     }
   },
   component: () => (
-    <div className="App">
+    <div className="wrapper">
       <Navbar />
       <Outlet />
     </div>
