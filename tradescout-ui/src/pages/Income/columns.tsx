@@ -3,31 +3,34 @@ import type { GridColDef } from "@mui/x-data-grid";
 import { type ReactElement, useState } from "react";
 import { MoreVertOutlined } from "@mui/icons-material";
 
-export const columns = (): GridColDef[] => [
+export const columns = (setData, closeModal): GridColDef[] => [
   {
     field: "actions",
     headerName: "",
     sortable: false,
     hideable: false,
-    renderCell: () => {
+    renderCell: (params) => {
       const [anchorEl, setAnchorEl] = useState<ReactElement | null>(null);
       const open = Boolean(anchorEl);
 
-      const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+      const handleButtonClick = (
+        event: React.MouseEvent<HTMLButtonElement>,
+      ) => {
         setAnchorEl(event.currentTarget);
       };
 
-      const handleClose = () => setAnchorEl(null);
+      const handleClose = () => {
+        setAnchorEl(null);
+        closeModal();
+      };
 
       return (
         <>
-          <IconButton onClick={handleClick}>
+          <IconButton onClick={handleButtonClick}>
             <MoreVertOutlined />
           </IconButton>
           <Menu open={open} onClose={handleClose} anchorEl={anchorEl}>
-            <MenuItem onClick={(params) => console.log(params.row)}>
-              Edit
-            </MenuItem>
+            <MenuItem onClick={() => setData(params.row)}>Edit</MenuItem>
             <MenuItem>Delete</MenuItem>
           </Menu>
         </>

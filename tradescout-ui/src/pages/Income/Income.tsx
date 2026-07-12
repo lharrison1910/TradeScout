@@ -1,12 +1,27 @@
-import { Box, Button, CircularProgress } from "@mui/material";
+import {
+  // Autocomplete,
+  Box,
+  CircularProgress,
+  // TextField,
+} from "@mui/material";
 import { useGetIncome } from "../../hooks/useGetIncome/useGetIncome";
 import Grid from "../../components/Grid/Grid";
 import { columns } from "./columns";
+import Button from "../../components/Button/Button";
+import { useState } from "react";
+import IncomeModal from "../../components/IncomeModal/IncomeModal";
+// import { useGetBusiness } from "../../hooks/Business/useGetBusiness/useGetBusiness";
 
 const IncomePage = () => {
-  const { data: income, isLoading } = useGetIncome();
+  const [editData, setEditData] = useState();
 
-  if (isLoading) {
+  const { data: income, isLoading: incomeLoading } = useGetIncome();
+  // const { data: businesses, isLoading: businessesLoading } = useGetBusiness();
+
+  const handleClose = () => {
+    setEditData(undefined);
+  };
+  if (incomeLoading) {
     return <CircularProgress />;
   }
   return (
@@ -16,13 +31,27 @@ const IncomePage = () => {
           display: "flex",
           flexDirection: "column",
           width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        <Box sx={{ width: "50%", maxHeight: "50%" }}>
-          <Grid columns={columns()} rows={income} />
+        {/* <Autocomplete
+        options={businesses}
+        getOptionLabel={(option) => option.name}
+        renderInput={(params) => <TextField {...params} />}
+      /> */}
+        <Box sx={{ width: "75%", display: "flex", justifyContent: "flex-end" }}>
+          <Button
+            title="Export this Quarter"
+            onClick={() => console.log("will export csv")}
+          />
         </Box>
-        <Button>Export this Quarter</Button>
+
+        <Box sx={{ width: "75%", maxHeight: "50%" }}>
+          <Grid columns={columns(setEditData, handleClose)} rows={income} />
+        </Box>
       </Box>
+      <IncomeModal open={editData} handleClose={undefined} data={editData} />
     </>
   );
 };

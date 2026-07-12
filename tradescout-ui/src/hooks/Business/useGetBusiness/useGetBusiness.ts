@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { businessApiClient } from "../../../api/BusinessApiClient";
 
-export const useGetRecent = () =>
+export const useGetBusiness = () =>
   useQuery({
-    queryKey: ["useGetRecent"],
-    queryFn: () => businessApiClient.recentTransaction(),
+    queryKey: ["useGetBusiness"],
+    queryFn: () => businessApiClient.getBusinesses(),
   });
