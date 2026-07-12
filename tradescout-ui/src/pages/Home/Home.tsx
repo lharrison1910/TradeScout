@@ -185,12 +185,19 @@ const Home = () => {
           </Box>
         </Paper>
 
-        <Paper sx={{ padding: 2, width: "50%", justifyContent: "center" }}>
+        <Paper sx={{ padding: 2, width: "50%" }}>
           <SnapRecieptCard
             title="Snap Reciept"
             handleFormChange={(formData) => console.log(formData)}
           />
-          <Box sx={{ display: "flex", gap: 1, margin: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              margin: 2,
+              justifyContent: "center",
+            }}
+          >
             <Button onClick={() => setIncomeModal(true)} title="Log Income" />
             <Button title="Log Expense" onClick={() => setExpenseModal(true)} />
             <Button title={`Pending (${3})`} onClick={() => {}} />
