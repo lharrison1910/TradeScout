@@ -1,6 +1,6 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { BusinessService } from './Business.service';
-import { CurrentUser } from 'src/decorator/currentUser.decorator';
+import { CurrentUser } from '../decorator/currentUser.decorator';
 import { AuthGuard } from '@nestjs/passport';
 
 @UseGuards(AuthGuard('jwt'))
@@ -9,9 +9,13 @@ export class BusinessController {
   constructor(private readonly businessService: BusinessService) {}
 
   @Get('/recent')
-  async getRecentBusiness(@CurrentUser() currentUser) {
+  async getRecentBusiness(
+    @CurrentUser('userId') currentUser: number,
+    @Param('id') businessId: string,
+  ) {
     return await this.businessService.getRecentBusinessTransactions(
       currentUser,
+      businessId,
     );
   }
 }

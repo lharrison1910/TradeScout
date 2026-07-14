@@ -10,20 +10,24 @@ import {
 } from "@mui/icons-material";
 import {
   AppBar,
+  Autocomplete,
   Box,
   IconButton,
   Menu,
   MenuItem,
+  TextField,
   Typography,
 } from "@mui/material";
 import Button from "../../components/Button/Button";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTheme } from "../../hooks/useTheme/useTheme";
+import { useAuth } from "../../hooks/useAuth/useAuth";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { toggleTheme, mode } = useTheme();
+  const { user } = useAuth();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
 
@@ -41,6 +45,8 @@ const Navbar = () => {
     handleClose();
   };
 
+  console.log(user);
+
   return (
     <AppBar
       position="static"
@@ -53,16 +59,16 @@ const Navbar = () => {
         marginBottom: 2,
       }}
     >
-      <Box>
+      <Box sx={{ display: "flex" }}>
         <Button
-          title="Home"
+          title=""
           sx={{ color: "white" }}
           onClick={() => navigate({ to: "/" })}
           endIcon={<Home />}
         />
 
         <Button
-          title="Income"
+          title=""
           sx={{ color: "white" }}
           onClick={() =>
             navigate({
@@ -73,10 +79,16 @@ const Navbar = () => {
         />
 
         <Button
-          title="Expense"
+          title=""
           sx={{ color: "white" }}
           onClick={() => navigate({ to: "/expense" })}
           endIcon={<TrendingDown />}
+        />
+        <Autocomplete
+          options={user.businesses}
+          defaultValue={user.businesses[0]}
+          getOptionLabel={(option) => option.name}
+          renderInput={(params) => <TextField {...params} />}
         />
       </Box>
 

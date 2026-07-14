@@ -14,9 +14,9 @@ export class BusinessService {
     private readonly businessRepository: Repository<Business>,
   ) {}
 
-  async getBusiness(currentUser, businessId?: string) {
+  async getBusiness(currentUser: number, businessId?: string) {
     let business: Business | Business[] | null;
-    const findOptions = { userId: currentUser.userId };
+    const findOptions = { userId: currentUser };
     if (businessId) {
       findOptions['id'] = businessId;
     }
@@ -36,35 +36,38 @@ export class BusinessService {
     return business;
   }
 
-  async getRecentBusinessTransactions(currentUser) {
-    const { userId, businessId } = currentUser;
-
-    const business = await this.businessRepository
-      .createQueryBuilder('business')
-      .leftJoinAndSelect('business.income', 'income')
-      .leftJoinAndSelect('business.expense', 'expense')
-      .where('business.id = :businessId', { businessId })
-      .andWhere('business.userId = :userId', { userId })
-
-      .orderBy('COALESCE(income.updatedAt, income.createdAt)', 'DESC')
-      .addOrderBy('COALESCE(expense.updatedAt, expense.createdAt)', 'DESC')
-
-      .getOne();
+  async getRecentBusinessTransactions(currentUser: number, businessId: string) {
+    const business = await this.businessRepository.find({
+      where: { id: businessId, userId: currentUser },
+      relations: {
+        income: true,
+        expense: true,
+      },
+    });
 
     if (!business) {
-      throw new NotFoundException(
-        'Business dashboard data could not be found.',
-      );
+      throw new NotFoundException('Business data could not be found.');
     }
+
+    // .createQueryBuilder('business')
+    // .leftJoinAndSelect('business.income', 'income')
+    // .leftJoinAndSelect('business.expense', 'expense')
+    // .where('business.id = :businessId', { businessId })
+    // .andWhere('business.userId = :userId', { userId })
+    // .orderBy('COALESCE(income.updatedAt, income.createdAt)', 'DESC')
+    // .addOrderBy('COALESCE(expense.updatedAt, expense.createdAt)', 'DESC')
+    // .getOne();
+
+    console.log(business, 'business response');
 
     return business;
   }
 
-  async addBusiness(currentUser, payload) {
+  async addBusiness(currentUser: number, payload: Partial<Business>) {
     try {
       const businessToSave = this.businessRepository.create({
         ...payload,
-        userId: currentUser.userId,
+        userId: currentUser,
       });
       const business = await this.businessRepository.save(businessToSave);
 

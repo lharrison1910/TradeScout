@@ -13,8 +13,8 @@ import {
 import type { Response } from 'express';
 import { ExpenseService } from './Expense.service';
 import type { CreateExpenseDto, UpdateExpenseDto } from './Expense.dto';
-import { JwtAuthGuard } from 'src/Auth/auth.guard';
-import { CurrentUser } from 'src/decorator/currentUser.decorator';
+import { JwtAuthGuard } from '../Auth/auth.guard';
+import { CurrentUser } from '../decorator/currentUser.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('expense')

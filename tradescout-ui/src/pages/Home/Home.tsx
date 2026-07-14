@@ -9,7 +9,6 @@ import {
   TableBody,
   TableRow,
   Table,
-  Skeleton,
 } from "@mui/material";
 import { SnapRecieptCard } from "../../components/SnapRecieptCard/SnapRecieptCard";
 import ExpenseModal from "../../components/ExpenseModal/ExpenseModal";
@@ -19,6 +18,7 @@ import { useAuth } from "../../hooks/useAuth/useAuth";
 import Button from "../../components/Button/Button";
 import { useGetRecent } from "../../hooks/Business/useGetRecent/useGetRecent";
 import { useToast } from "../../hooks/useToast/useToast";
+import SkeletonTable from "../../components/Skeleton/SkeletonTable";
 
 const RecentTable = () => {
   const toast = useToast();
@@ -29,44 +29,7 @@ const RecentTable = () => {
   }
 
   if (isLoading || error) {
-    return (
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>
-              <Skeleton variant="text" width="60%" />
-            </TableCell>
-            <TableCell>
-              <Skeleton variant="text" width="40%" />
-            </TableCell>
-            <TableCell>
-              <Skeleton variant="text" width="80%" />
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {[1, 2, 3, 4].map((index) => (
-            <TableRow key={index}>
-              <TableCell>
-                <Skeleton
-                  variant="rectangular"
-                  sx={{ width: "50px", height: 20, borderRadius: 1 }}
-                />
-              </TableCell>
-              <TableCell>
-                <Skeleton
-                  variant="rectangular"
-                  sx={{ width: "70px", height: 20, borderRadius: 4 }}
-                />
-              </TableCell>
-              <TableCell>
-                <Skeleton variant="text" width="90%" height={20} />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    );
+    return <SkeletonTable />;
   }
 
   return (
