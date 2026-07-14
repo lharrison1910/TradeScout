@@ -1,22 +1,80 @@
-import { Box, Button, CircularProgress } from "@mui/material";
+import {
+  Autocomplete,
+  // Autocomplete,
+  Box,
+  CircularProgress,
+  TextField,
+  // TextField,
+} from "@mui/material";
 import { useGetIncome } from "../../hooks/useGetIncome/useGetIncome";
 import Grid from "../../components/Grid/Grid";
 import { columns } from "./columns";
+import Button from "../../components/Button/Button";
+import { useState } from "react";
+import IncomeModal from "../../components/IncomeModal/IncomeModal";
+import DeleteModal from "../../components/DeleteModal/DeleteModal";
+import { useGetUser } from "../../hooks/User/useGetUser/useGetUser";
+// import { useGetBusiness } from "../../hooks/Business/useGetBusiness/useGetBusiness";
 
 const IncomePage = () => {
-  const { data: income, isLoading } = useGetIncome();
+  const [editData, setEditData] = useState();
+  const [deleteData, setDeleteData] = useState<number>();
+  const deleteOpen = Boolean(deleteData);
 
-  if (isLoading) {
+  //filter income on business
+  const { data: income, isLoading: incomeLoading } = useGetIncome();
+  const { data: user, isLoading: userLoading } = useGetUser();
+
+  const handleClose = () => {
+    setEditData(undefined);
+  };
+
+  if (incomeLoading || userLoading) {
     return <CircularProgress />;
   }
   return (
     <>
-      <Box sx={{ display: "flex", width: "100%", height: "100%" }}>
-        <Box sx={{ width: "50%", maxHeight: "50%" }}>
-          <Grid columns={columns()} rows={income} />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 2,
+        }}
+      >
+        <Box
+          sx={{
+            width: "75%",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <Autocomplete
+            options={user.businesses}
+            defaultValue={user.businesses[0]}
+            getOptionLabel={(option) => option.name}
+            sx={{ width: "25%" }}
+            renderInput={(params) => (
+              <TextField {...params} placeholder="Businesses" />
+            )}
+          />
+          <Button
+            title="Export this Quarter"
+            onClick={() => console.log("will export csv")}
+          />
         </Box>
-        <Button>Export this Quarter</Button>
+
+        <Box sx={{ width: "75%", maxHeight: "50%" }}>
+          <Grid
+            columns={columns(setEditData, handleClose, setDeleteData)}
+            rows={income}
+          />
+        </Box>
       </Box>
+      <IncomeModal open={editData} handleClose={handleClose} data={editData} />
+      <DeleteModal open={deleteOpen} handleClose={() => setDeleteData(null)} />
     </>
   );
 };

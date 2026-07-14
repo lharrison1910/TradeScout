@@ -3,32 +3,35 @@ import type { GridColDef } from "@mui/x-data-grid";
 import { type ReactElement, useState } from "react";
 import { MoreVertOutlined } from "@mui/icons-material";
 
-export const columns = (): GridColDef[] => [
+export const columns = (setData, closeModal, setDelete): GridColDef[] => [
   {
     field: "actions",
     headerName: "",
     sortable: false,
     hideable: false,
-    renderCell: () => {
+    renderCell: (params) => {
       const [anchorEl, setAnchorEl] = useState<ReactElement | null>(null);
       const open = Boolean(anchorEl);
 
-      const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+      const handleButtonClick = (
+        event: React.MouseEvent<HTMLButtonElement>,
+      ) => {
         setAnchorEl(event.currentTarget);
       };
 
-      const handleClose = () => setAnchorEl(null);
+      const handleClose = () => {
+        setAnchorEl(null);
+        closeModal();
+      };
 
       return (
         <>
-          <IconButton onClick={handleClick}>
+          <IconButton onClick={handleButtonClick}>
             <MoreVertOutlined />
           </IconButton>
           <Menu open={open} onClose={handleClose} anchorEl={anchorEl}>
-            <MenuItem onClick={(params) => console.log(params.row)}>
-              Edit
-            </MenuItem>
-            <MenuItem>Delete</MenuItem>
+            <MenuItem onClick={() => setData(params.row)}>Edit</MenuItem>
+            <MenuItem onClick={() => setDelete(params.row.id)}>Delete</MenuItem>
           </Menu>
         </>
       );
@@ -38,8 +41,9 @@ export const columns = (): GridColDef[] => [
   {
     field: "dateReceived",
     headerName: "Date Recieved",
-    width: 110,
+    width: 130,
     sortable: true,
+    flex: 1,
     renderCell(params) {
       return <>{params.row.dateReceived.split("T")[0]}</>;
     },
@@ -48,24 +52,32 @@ export const columns = (): GridColDef[] => [
     field: "amount",
     headerName: "Amount (£)",
     sortable: true,
-    // maxWidth: 100,
+    flex: 1,
   },
   {
     field: "category",
     headerName: "Category",
     sortable: true,
+    flex: 1,
+
+    renderCell: (params) => {
+      return <>{params.row.category.replaceAll("_", " ")}</>;
+    },
     // maxWidth: 100,
   },
   {
     field: "paymentMethod",
     headerName: "Payment type",
     sortable: true,
-    // maxWidth: 100,
+    width: 120,
+    flex: 1,
   },
   {
-    field: "jobReference",
+    field: "reference",
     headerName: "Job Reference",
     sortable: true,
     // maxWidth: 100,
+    width: 120,
+    flex: 1,
   },
 ];

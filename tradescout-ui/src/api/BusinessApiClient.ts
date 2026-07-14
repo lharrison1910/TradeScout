@@ -11,6 +11,14 @@ class BusinessApiClient extends BaseApi {
     return BusinessApiClient.instance;
   }
 
+  async getBusinesses() {
+    return await this.get(`${this.business}`);
+  }
+
+  async recentTransaction() {
+    return await this.get(`${this.business}/recent`);
+  }
+
   async newBusiness(payload) {
     const body = JSON.stringify(payload);
     return await this.post(`${this.business}`, body);

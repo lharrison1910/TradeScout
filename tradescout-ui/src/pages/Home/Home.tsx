@@ -3,18 +3,93 @@ import {
   Paper,
   Typography,
   LinearProgress,
-  Button,
-  List,
-  ListItem,
-  CircularProgress,
+  Divider,
+  TableHead,
+  TableCell,
+  TableBody,
+  TableRow,
+  Table,
+  Skeleton,
 } from "@mui/material";
 import { SnapRecieptCard } from "../../components/SnapRecieptCard/SnapRecieptCard";
 import ExpenseModal from "../../components/ExpenseModal/ExpenseModal";
 import IncomeModal from "../../components/IncomeModal/IncomeModal";
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth/useAuth";
-import { useGetExpense } from "../../hooks/useGetExpense/useGetExpense";
-import { useGetRecentIncome } from "../../hooks/useGetRecentIncome/useGetRecentIncome";
+import Button from "../../components/Button/Button";
+import { useGetRecent } from "../../hooks/Business/useGetRecent/useGetRecent";
+import { useToast } from "../../hooks/useToast/useToast";
+
+const RecentTable = () => {
+  const toast = useToast();
+  const { data: recent, isLoading, error } = useGetRecent();
+
+  if (error) {
+    toast.error(error.message);
+  }
+
+  if (isLoading || error) {
+    return (
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>
+              <Skeleton variant="text" width="60%" />
+            </TableCell>
+            <TableCell>
+              <Skeleton variant="text" width="40%" />
+            </TableCell>
+            <TableCell>
+              <Skeleton variant="text" width="80%" />
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {[1, 2, 3, 4].map((index) => (
+            <TableRow key={index}>
+              <TableCell>
+                <Skeleton
+                  variant="rectangular"
+                  sx={{ width: "50px", height: 20, borderRadius: 1 }}
+                />
+              </TableCell>
+              <TableCell>
+                <Skeleton
+                  variant="rectangular"
+                  sx={{ width: "70px", height: 20, borderRadius: 4 }}
+                />
+              </TableCell>
+              <TableCell>
+                <Skeleton variant="text" width="90%" height={20} />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    );
+  }
+
+  return (
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableCell>Amount</TableCell>
+          <TableCell>Type</TableCell>
+          <TableCell>Details</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {recent.map((row) => (
+          <TableRow key={row.id}>
+            <TableCell>£ {row.amount}</TableCell>
+            <TableCell>need to find type</TableCell>
+            <TableCell>{row.reference || row.description}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+};
 
 const Home = () => {
   const [expenseModal, setExpenseModal] = useState<boolean>(false);
@@ -56,15 +131,6 @@ const Home = () => {
 
   const currentQuater = getFiscalQuarter(new Date().getMonth() + 1);
 
-  const { data: income, isLoading: incomeLoading } = useGetRecentIncome();
-  const { data: expense, isLoading: expenseLoading } = useGetExpense();
-
-  if (incomeLoading || expenseLoading) {
-    return <CircularProgress />;
-  }
-
-  const recents = [...income, ...expense];
-
   return (
     <>
       <Box
@@ -72,49 +138,76 @@ const Home = () => {
           display: "flex",
           flexDirection: "column",
           gap: 4,
-          height: "100%",
+          alignItems: "center",
         }}
       >
         <Paper
           sx={{
             display: "flex",
             flexDirection: "column",
-            height: "15%",
+            minHeight: "15%",
+            width: "50%",
             justifyContent: "space-around",
+            padding: 2,
+            alignItems: "center",
           }}
         >
           <Typography variant="h2">Hello {user.name}!</Typography>
-          <Typography>Current MTD Quarter: Q2 ({currentQuater})</Typography>
-          <Typography>
+
+          <Box
+            sx={{
+              width: "fit-content",
+              display: "flex",
+              flexDirection: "column",
+              gap: 1,
+            }}
+          >
+            <Typography sx={{ fontWeight: 500 }}>
+              Current MTD Quarter: Q2 ({currentQuater})
+            </Typography>
+
             <LinearProgress
               variant="determinate"
               value={30}
-              sx={{ width: "75%" }}
+              sx={{
+                width: "100%",
+                borderRadius: 2,
+                height: 6,
+              }}
             />
-            {30} Days left
-          </Typography>
+
+            <Typography
+              variant="body2"
+              sx={{ textAlign: "right", color: "text.secondary" }}
+            >
+              {30} Days left
+            </Typography>
+          </Box>
         </Paper>
 
-        <Paper>
-          <Typography>Log expense</Typography>
+        <Paper sx={{ padding: 2, width: "50%" }}>
           <SnapRecieptCard
             title="Snap Reciept"
             handleFormChange={(formData) => console.log(formData)}
           />
-          <Button onClick={() => setIncomeModal(true)}>Log Income</Button>
-          <Button>Log Expense</Button>
-          <Button>Pending (3)</Button>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              margin: 2,
+              justifyContent: "center",
+            }}
+          >
+            <Button onClick={() => setIncomeModal(true)} title="Log Income" />
+            <Button title="Log Expense" onClick={() => setExpenseModal(true)} />
+            <Button title={`Pending (${3})`} onClick={() => {}} />
+          </Box>
         </Paper>
 
-        <Paper>
-          <Typography>Recent Activity</Typography>
-          <List>
-            {/*map items*/}
-            {recents.map((row) => (
-              <ListItem>{row.amount}</ListItem>
-            ))}
-            <ListItem></ListItem>
-          </List>
+        <Paper sx={{ width: "50%", padding: 2 }}>
+          <Typography variant="h5">Recent Activity</Typography>
+          <Divider />
+          <RecentTable />
         </Paper>
       </Box>
 
@@ -125,6 +218,7 @@ const Home = () => {
       <IncomeModal
         open={incomeModal}
         handleClose={() => setIncomeModal(false)}
+        data={undefined}
       />
     </>
   );

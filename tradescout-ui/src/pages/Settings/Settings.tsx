@@ -15,20 +15,20 @@ const Settings = () => {
       <Box
         sx={{
           width: "100%",
-          height: "100%",
           display: "flex",
+          marginTop: 2,
           flexDirection: "column",
-          justifyContent: "center",
           alignItems: "center",
           gap: 2,
         }}
       >
-        <Paper>
+        <Paper sx={{ width: "75%" }}>
           <UserSection user={user} />
         </Paper>
 
-        <Divider />
-        <Paper>
+        <Divider sx={{ width: "75%", borderColor: "black" }} />
+
+        <Paper sx={{ width: "75%" }}>
           <BusinessSection businesses={user.businesses} />
         </Paper>
       </Box>

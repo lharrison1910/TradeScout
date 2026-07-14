@@ -1,40 +1,60 @@
+import Modal from "../Modal/Modal";
+import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { SnapRecieptCard } from "../SnapRecieptCard/SnapRecieptCard";
+import { useEffect, useState } from "react";
+import dayjs, { Dayjs } from "dayjs";
+import { usePostIncome } from "../../hooks/usePostIncome/usePostIncome";
 import {
-  Modal,
   Box,
-  Button,
   Typography,
   TextField,
   Select,
   MenuItem,
   Divider,
-  CircularProgress,
 } from "@mui/material";
-import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { SnapRecieptCard } from "../SnapRecieptCard/SnapRecieptCard";
-import { useState } from "react";
-import dayjs, { Dayjs } from "dayjs";
-import { usePostIncome } from "../../hooks/usePostIncome/usePostIncome";
+import { MtdIncomeCategory } from "../../types/HmrcCategoryEnum";
 
 interface incomeType {
-  total: number;
-  paymentType: string;
-  job: number;
-  dateReceived: Dayjs;
+  amount: number;
+  businessId: string;
+  category: string;
+  dateReceived: string | Dayjs;
+  id?: number;
+  isDailyTotal?: boolean;
+  reference?: string;
+  paymentMethod?: string;
+  userId?: number;
 }
 
 const IncomeModal = ({ open, handleClose, data }) => {
   const [form, setForm] = useState<incomeType>({
-    total: 0,
-    paymentType: "Bank Transfer",
-    job: 0,
+    amount: 0,
+    paymentMethod: "Bank Transfer",
+    reference: "",
     dateReceived: dayjs(),
   });
+
   const formData = new FormData();
 
-  if (data) {
-    setForm(data);
-  }
+  useEffect(() => {
+    if (open) {
+      if (data) {
+        setForm({
+          ...data,
+          dateReceived: dayjs(data.dateReceived),
+        });
+      } else {
+        setForm({
+          amount: 0,
+          paymentMethod: "Bank Transfer",
+          reference: "",
+          dateReceived: dayjs(),
+        });
+      }
+      // setErrors({});
+    }
+  }, [data, open]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { mutate, isPending, error } = usePostIncome();
@@ -58,104 +78,83 @@ const IncomeModal = ({ open, handleClose, data }) => {
   const handleSave = () => {
     const formattedData = {
       ...form,
-      dateReceived: form.dateReceived.toISOString(),
+      dateReceived: dayjs(form.dateReceived).toISOString(),
     };
 
-    const stringData = JSON.stringify(formattedData);
-    formData.append("incomeData", JSON.stringify(stringData));
-
-    // mutate(formData);
-  };
-
-  const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    maxWidth: "80%",
-    bgcolor: "background.paper",
-    border: "2px solid #000",
-    boxShadow: 24,
-    p: 4,
-
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
+    formData.append("incomeData", JSON.stringify(formattedData));
+    mutate(formData);
   };
 
   return (
-    <Modal open={open} onClose={closeModal}>
-      <Box sx={style}>
-        <Box>
-          <Button
-            onClick={closeModal}
-            size="small"
-            sx={{ position: "absolute", left: 10, top: 5 }}
-          >
-            Back
-          </Button>
-          <Typography>New Income</Typography>
-        </Box>
+    <Modal
+      open={open}
+      handleClose={closeModal}
+      title={"New Income"}
+      handleSave={handleSave}
+    >
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Typography>Total Received (£)</Typography>
+        <TextField
+          type="number"
+          name="amount"
+          value={form.amount}
+          onChange={(event) =>
+            handleChange(event.target.name, Number(event.target.value))
+          }
+          error={!!errors.total}
+          helperText={errors.total}
+        />
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <Typography>Totla Received (£)</Typography>
-          <TextField
-            type="number"
-            name="total"
-            value={form.total}
-            onChange={(event) =>
-              handleChange(event.target.name, Number(event.target.value))
-            }
-            error={!!errors.total}
-            helperText={errors.total}
+        <Typography>Client / Job Reference</Typography>
+        <TextField />
+
+        <Typography>Payment type</Typography>
+        <Select
+          fullWidth
+          name="paymentMethod"
+          value={form.paymentMethod}
+          onChange={(event) =>
+            handleChange(event.target.name, event.target.value)
+          }
+          error={!!errors.paymentType}
+        >
+          <MenuItem value={"Bank Transfer"}>Bank Transfer</MenuItem>
+          <MenuItem value={"Cash"}>Cash</MenuItem>
+          <MenuItem value={"Card Reader"}>Card Reader</MenuItem>
+          <MenuItem value={"Cheque"}>Cheque</MenuItem>
+        </Select>
+
+        <Typography>Income Category</Typography>
+        <Select
+          fullWidth
+          name="category"
+          value={form.category}
+          onChange={(event) => handleChange("category", event.target.value)}
+        >
+          {Object.values(MtdIncomeCategory).map((category) => (
+            <MenuItem key={category} value={category}>
+              {category}
+            </MenuItem>
+          ))}
+        </Select>
+
+        <Typography>Date Recieved</Typography>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DateTimePicker
+            name="dateReceived"
+            value={form.dateReceived}
+            onChange={(newValue) => handleChange("dateReceived", newValue)}
           />
+        </LocalizationProvider>
 
-          <Typography>Client / Job Reference</Typography>
-          <TextField />
-
-          <Typography>Payment type</Typography>
-          <Select
-            fullWidth
-            name="paymentType"
-            value={form.paymentType}
-            onChange={(event) =>
-              handleChange(event.target.name, event.target.value)
-            }
-            error={!!errors.paymentType}
-          >
-            <MenuItem value={"Bank Transfer"}>Bank Transfer</MenuItem>
-            <MenuItem value={"Cash"}>Cash</MenuItem>
-            <MenuItem value={"Card Reader"}>Card Reader</MenuItem>
-            <MenuItem value={"Cheque"}>Cheque</MenuItem>
-          </Select>
-
-          <Typography>Date Recieved</Typography>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DateTimePicker
-              name="dateReceived"
-              value={form.dateReceived}
-              onChange={(newValue) => handleChange("dateReceived", newValue)}
-            />
-          </LocalizationProvider>
-
-          <Divider />
-          <Box>
-            <SnapRecieptCard
-              title="Snap Income"
-              handleFormChange={(file) => {
-                formData.append("proof", file);
-              }}
-            />
-          </Box>
-        </Box>
+        <Divider />
         <Box>
-          <Button color="success" onClick={handleSave}>
-            Save
-          </Button>
-          <Button color="error" onClick={closeModal}>
-            Cancel
-          </Button>
+          <SnapRecieptCard
+            title="Snap Income"
+            handleFormChange={(file) => {
+              formData.append("proof", file);
+            }}
+          />
         </Box>
       </Box>
     </Modal>
