@@ -1,7 +1,8 @@
-import { Box, Typography, TextField, Button, Stack } from "@mui/material";
+import { Box, Typography, TextField, Stack } from "@mui/material";
 import { useState } from "react";
 import { passwordCheck } from "../../utils/passwordChecks";
 import { usePutUser } from "../../hooks/User/usePutUser/usePutUser";
+import Button from "../../components/Button/Button";
 
 const UserSection = ({ user }) => {
   const { mutate: updateUser } = usePutUser();
@@ -68,10 +69,13 @@ const UserSection = ({ user }) => {
             onChange={(event) => handleChange(event)}
           />
         </Box>
-        <Button onClick={handleDetailSave}>Save changes</Button>
+        <Button
+          title="Save Changes"
+          onClick={handleDetailSave}
+          sx={{ width: "25%" }}
+        />
       </Box>
 
-      {/* linked accounts */}
       {user.authProvider === "local" ? (
         <Typography>No linked accounts</Typography>
       ) : (
@@ -97,11 +101,10 @@ const UserSection = ({ user }) => {
           />
         </Box>
 
-        <Button onClick={handleSavePasswordChange}>Save password</Button>
+        <Button title="Save password" onClick={handleSavePasswordChange} />
       </Box>
-      <Box>
-        <Button color="error">Delete account?</Button>
-      </Box>
+
+      <Button title="Delete account" color="error" onClick={() => {}} />
     </Stack>
   );
 };

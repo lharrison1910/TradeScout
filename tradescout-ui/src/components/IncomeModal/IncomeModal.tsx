@@ -2,7 +2,7 @@ import Modal from "../Modal/Modal";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { SnapRecieptCard } from "../SnapRecieptCard/SnapRecieptCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { usePostIncome } from "../../hooks/usePostIncome/usePostIncome";
 import {
@@ -13,26 +13,48 @@ import {
   MenuItem,
   Divider,
 } from "@mui/material";
+import { MtdIncomeCategory } from "../../types/HmrcCategoryEnum";
 
 interface incomeType {
-  total: number;
-  paymentType: string;
-  job: number;
-  dateReceived: Dayjs;
+  amount: number;
+  businessId: string;
+  category: string;
+  dateReceived: string | Dayjs;
+  id?: number;
+  isDailyTotal?: boolean;
+  reference?: string;
+  paymentMethod?: string;
+  userId?: number;
 }
 
 const IncomeModal = ({ open, handleClose, data }) => {
   const [form, setForm] = useState<incomeType>({
-    total: 0,
-    paymentType: "Bank Transfer",
-    job: 0,
+    amount: 0,
+    paymentMethod: "Bank Transfer",
+    reference: "",
     dateReceived: dayjs(),
   });
+
   const formData = new FormData();
 
-  if (data) {
-    setForm(data);
-  }
+  useEffect(() => {
+    if (open) {
+      if (data) {
+        setForm({
+          ...data,
+          dateReceived: dayjs(data.dateReceived),
+        });
+      } else {
+        setForm({
+          amount: 0,
+          paymentMethod: "Bank Transfer",
+          reference: "",
+          dateReceived: dayjs(),
+        });
+      }
+      // setErrors({});
+    }
+  }, [data, open]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { mutate, isPending, error } = usePostIncome();
@@ -56,12 +78,10 @@ const IncomeModal = ({ open, handleClose, data }) => {
   const handleSave = () => {
     const formattedData = {
       ...form,
-      dateReceived: form.dateReceived.toISOString(),
+      dateReceived: dayjs(form.dateReceived).toISOString(),
     };
 
-    const stringData = JSON.stringify(formattedData);
-    formData.append("incomeData", JSON.stringify(stringData));
-
+    formData.append("incomeData", JSON.stringify(formattedData));
     mutate(formData);
   };
 
@@ -76,8 +96,8 @@ const IncomeModal = ({ open, handleClose, data }) => {
         <Typography>Total Received (£)</Typography>
         <TextField
           type="number"
-          name="total"
-          value={form.total}
+          name="amount"
+          value={form.amount}
           onChange={(event) =>
             handleChange(event.target.name, Number(event.target.value))
           }
@@ -91,8 +111,8 @@ const IncomeModal = ({ open, handleClose, data }) => {
         <Typography>Payment type</Typography>
         <Select
           fullWidth
-          name="paymentType"
-          value={form.paymentType}
+          name="paymentMethod"
+          value={form.paymentMethod}
           onChange={(event) =>
             handleChange(event.target.name, event.target.value)
           }
@@ -102,6 +122,20 @@ const IncomeModal = ({ open, handleClose, data }) => {
           <MenuItem value={"Cash"}>Cash</MenuItem>
           <MenuItem value={"Card Reader"}>Card Reader</MenuItem>
           <MenuItem value={"Cheque"}>Cheque</MenuItem>
+        </Select>
+
+        <Typography>Income Category</Typography>
+        <Select
+          fullWidth
+          name="category"
+          value={form.category}
+          onChange={(event) => handleChange("category", event.target.value)}
+        >
+          {Object.values(MtdIncomeCategory).map((category) => (
+            <MenuItem key={category} value={category}>
+              {category}
+            </MenuItem>
+          ))}
         </Select>
 
         <Typography>Date Recieved</Typography>
