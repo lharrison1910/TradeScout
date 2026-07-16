@@ -8,7 +8,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { AuthProviderType, User } from '../User/User.entity';
-import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +22,10 @@ export class AuthService {
   }
 
   async login(email: string, pass: string) {
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userRepository.findOne({
+      where: { email },
+      relations: { businesses: true },
+    });
 
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
@@ -37,11 +39,20 @@ export class AuthService {
     const payload = {
       sub: user.id,
       email: user.email,
-      businessId: randomUUID(),
     };
     const token = this.generateJwt(payload);
 
-    const response = { user: { email: user.email, name: user.name }, token };
+    console.log(user.businesses);
+
+    const response = {
+      user: {
+        email: user.email,
+        name: user.name,
+        businesses: user.businesses,
+        provider: user.authProvider,
+      },
+      token,
+    };
 
     return response;
   }
