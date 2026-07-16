@@ -8,7 +8,7 @@ import { AuthGuard } from '@nestjs/passport';
 export class BusinessController {
   constructor(private readonly businessService: BusinessService) {}
 
-  @Get('/recent')
+  @Get('/recent/:id')
   async getRecentBusiness(
     @CurrentUser('userId') currentUser: number,
     @Param('id') businessId: string,

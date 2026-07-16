@@ -15,8 +15,8 @@ class BusinessApiClient extends BaseApi {
     return await this.get(`${this.business}`);
   }
 
-  async recentTransaction() {
-    return await this.get(`${this.business}/recent`);
+  async recentTransaction(businessId: string) {
+    return await this.get(`${this.business}/recent/${businessId}`);
   }
 
   async newBusiness(payload) {

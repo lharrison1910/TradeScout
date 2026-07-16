@@ -39,14 +39,16 @@ const RecentTable = () => {
           <TableCell>Amount</TableCell>
           <TableCell>Type</TableCell>
           <TableCell>Details</TableCell>
+          <TableCell>Date recieved</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
         {recent.map((row) => (
           <TableRow key={row.id}>
             <TableCell>£ {row.amount}</TableCell>
-            <TableCell>need to find type</TableCell>
+            <TableCell>{row.type}</TableCell>
             <TableCell>{row.reference || row.description}</TableCell>
+            <TableCell>{row.dateReceived.split("T")[0]}</TableCell>
           </TableRow>
         ))}
       </TableBody>
