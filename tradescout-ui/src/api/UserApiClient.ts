@@ -1,5 +1,5 @@
 import type { LoginPayload } from "../types/loginPayload";
-import { BaseApi } from "./BaseApi";
+import { BaseApi, executeSilentRefresh } from "./BaseApi";
 
 class UserApiClient extends BaseApi {
   private readonly auth = "auth";
@@ -24,7 +24,7 @@ class UserApiClient extends BaseApi {
   }
 
   async logout() {
-    return await this.get(this.auth);
+    return await this.post(`${this.auth}/logout`, "");
   }
 
   async googleLogin() {
@@ -40,6 +40,14 @@ class UserApiClient extends BaseApi {
     return await this.put(`${this.user}`, body);
   }
 
+  async me() {
+    return await this.get(`${this.auth}/me`);
+  }
+
+  async refresh() {
+    const accessToken = await executeSilentRefresh(this.url);
+    return { accessToken };
+  }
 }
 
 export const userApiClient = UserApiClient.getInstance();

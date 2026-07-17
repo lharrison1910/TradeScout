@@ -6,11 +6,14 @@ import {
   Get,
   Req,
   UseGuards,
+  UnauthorizedException,
 } from '@nestjs/common';
-import type { Response } from 'express';
+import type { Response, Request } from 'express';
 import { AuthService } from './Auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
+import { UserService } from '../User/User.service';
+import { CurrentUserType } from '../types/currentUser';
 
 interface LoginDto {
   email: string;
@@ -21,6 +24,7 @@ interface LoginDto {
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
+    private readonly userService: UserService,
     private configService: ConfigService,
   ) {}
 
@@ -34,25 +38,48 @@ export class AuthController {
       loginDto.password,
     );
 
-    const { user, token } = response;
+    const { user, tokens } = response;
+    const { accessToken, refreshToken } = tokens;
 
-    res.cookie('Authentication', token, {
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 1000 * 60 * 60 * 24,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return user;
+    return { accessToken, user };
+  }
+
+  @Post('refresh')
+  async refresh(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const oldRefreshToken = request.cookies['refreshToken'];
+    if (!oldRefreshToken) {
+      throw new UnauthorizedException('Refresh token is missing');
+    }
+
+    const decoded = await this.authService.verifyRefreshToken(oldRefreshToken);
+    const mockUser = { sub: decoded.sub, email: decoded.email };
+
+    const { accessToken, refreshToken: newRefreshToken } =
+      await this.authService.generateJwt(mockUser);
+
+    response.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return { accessToken };
   }
 
   @Post('logout')
   logout(@Res({ passthrough: true }) res: Response) {
-    res.cookie('Authentication', '', {
-      httpOnly: true,
-      expires: new Date(0),
-    });
-
+    res.clearCookie('refreshToken');
     return { message: 'Logged out successfully' };
   }
 
@@ -79,5 +106,11 @@ export class AuthController {
 
     const frontendUrl = this.configService.get<string>('FRONTEND_URL');
     return res.redirect(`${frontendUrl}/dashboard`);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('me')
+  async getProfile(@Req() req) {
+    return this.userService.getUser(req.user as CurrentUserType);
   }
 }

@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { passwordCheck } from 'src/utils/passwordCheck';
 import * as bcrypt from 'bcrypt';
+import { CurrentUserType } from 'src/types/currentUser';
 
 @Injectable()
 export class UserService {
@@ -22,7 +23,7 @@ export class UserService {
     private readonly logger: PinoLogger,
   ) {}
 
-  async getUser(currentUser) {
+  async getUser(currentUser: CurrentUserType) {
     let user: User | null;
 
     try {

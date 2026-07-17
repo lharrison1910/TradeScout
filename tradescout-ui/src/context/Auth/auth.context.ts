@@ -8,8 +8,9 @@ export interface AuthContextType {
   updateSelectedBusiness: (newBusiness: string) => void;
   isAuthenticated: boolean;
   isPending: boolean;
-  login: (newUser: User | null) => void;
+  login: (data: { accessToken: string; user: User }) => void;
   logout: () => void;
+  loading: boolean;
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -18,6 +19,7 @@ export const AuthContext = createContext<AuthContextType>({
   updateSelectedBusiness: (_newBusiness: string) => {},
   isAuthenticated: false,
   isPending: false,
-  login: (_newUser: User | null) => {},
+  login: (_data: { accessToken: string; user: User }) => {},
   logout: () => {},
+  loading: true,
 });

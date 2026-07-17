@@ -13,7 +13,7 @@ import {
 import { SnapRecieptCard } from "../../components/SnapRecieptCard/SnapRecieptCard";
 import ExpenseModal from "../../components/ExpenseModal/ExpenseModal";
 import IncomeModal from "../../components/IncomeModal/IncomeModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth/useAuth";
 import Button from "../../components/Button/Button";
 import { useGetRecent } from "../../hooks/Business/useGetRecent/useGetRecent";
@@ -22,13 +22,15 @@ import SkeletonTable from "../../components/Skeleton/SkeletonTable";
 
 const RecentTable = () => {
   const toast = useToast();
-  const { data: recent, isLoading, error } = useGetRecent();
+  const { data: recent, isFetching, isPending, error } = useGetRecent();
 
-  if (error) {
-    toast.error(error.message);
-  }
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message || "An error occurred while fetching data.");
+    }
+  }, [error, toast]);
 
-  if (isLoading || error) {
+  if (isFetching || isPending || error) {
     return <SkeletonTable />;
   }
 
