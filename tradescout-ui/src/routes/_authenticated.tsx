@@ -3,10 +3,17 @@ import Navbar from "../components/Navbar/Navbar";
 import "./_authenticated.css";
 
 export const Route = createFileRoute("/_authenticated")({
-  beforeLoad: ({ context }) => {
-    if (!context.auth?.user) {
+  beforeLoad: ({ context, location }) => {
+    if (context.auth.loading) {
+      return;
+    }
+
+    if (!context.auth.user) {
       throw redirect({
         to: "/login",
+        search: {
+          redirect: location.href,
+        },
       });
     }
   },

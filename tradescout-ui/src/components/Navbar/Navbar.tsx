@@ -23,6 +23,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTheme } from "../../hooks/useTheme/useTheme";
 import { useAuth } from "../../hooks/useAuth/useAuth";
+import { useLogout } from "../../hooks/User/useLogout/useLogout";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -30,6 +31,8 @@ const Navbar = () => {
   const { user } = useAuth();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
+
+  const { mutate: onLogout } = useLogout();
 
   const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) =>
     setAnchorEl(event.currentTarget);
@@ -44,8 +47,6 @@ const Navbar = () => {
     });
     handleClose();
   };
-
-  console.log(user);
 
   return (
     <AppBar
@@ -105,7 +106,7 @@ const Navbar = () => {
           <MenuItem onClick={() => handleMenuClick("settings")}>
             Settings <Settings />
           </MenuItem>
-          <MenuItem>
+          <MenuItem onClick={() => onLogout()}>
             Log out <Logout />
           </MenuItem>
         </Menu>

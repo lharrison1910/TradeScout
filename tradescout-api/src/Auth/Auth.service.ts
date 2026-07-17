@@ -8,6 +8,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { AuthProviderType, User } from '../User/User.entity';
+import { ConfigService } from '@nestjs/config';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 @Injectable()
 export class AuthService {
@@ -15,10 +17,27 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+
+    @InjectPinoLogger(AuthService.name)
+    private readonly logger: PinoLogger,
   ) {}
 
-  generateJwt(payload) {
-    return this.jwtService.sign(payload);
+  async generateJwt(payload) {
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get('SECRET_KEY'),
+      expiresIn: '15m',
+    });
+
+    const refreshToken = await this.jwtService.signAsync(
+      { sub: payload.sub },
+      {
+        secret: this.configService.get('SECRET_KEY'),
+        expiresIn: '7d',
+      },
+    );
+
+    return { accessToken, refreshToken };
   }
 
   async login(email: string, pass: string) {
@@ -40,9 +59,7 @@ export class AuthService {
       sub: user.id,
       email: user.email,
     };
-    const token = this.generateJwt(payload);
-
-    console.log(user.businesses);
+    const tokens = await this.generateJwt(payload);
 
     const response = {
       user: {
@@ -51,7 +68,7 @@ export class AuthService {
         businesses: user.businesses,
         provider: user.authProvider,
       },
-      token,
+      tokens,
     };
 
     return response;
@@ -103,5 +120,18 @@ export class AuthService {
     });
 
     return await this.userRepository.save(newUser);
+  }
+
+  async verifyRefreshToken(token: string) {
+    try {
+      return await this.jwtService.verifyAsync(token, {
+        secret: this.configService.get('SECRET_KEY'),
+      });
+    } catch (error) {
+      this.logger.error(
+        `verifyRefreshToken: Failed to validate token - ${error}`,
+      );
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
   }
 }
