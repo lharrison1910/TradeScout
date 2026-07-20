@@ -19,6 +19,7 @@ import Button from "../../components/Button/Button";
 import { useGetRecent } from "../../hooks/Business/useGetRecent/useGetRecent";
 import { useToast } from "../../hooks/useToast/useToast";
 import SkeletonTable from "../../components/Skeleton/SkeletonTable";
+import { NewInvoice } from "../../utils/NewInvoice";
 
 const RecentTable = () => {
   const toast = useToast();
@@ -167,7 +168,8 @@ const Home = () => {
           >
             <Button onClick={() => setIncomeModal(true)} title="Log Income" />
             <Button title="Log Expense" onClick={() => setExpenseModal(true)} />
-            <Button title={`Pending (${3})`} onClick={() => {}} />
+
+            <Button title="New Invoice" onClick={() => NewInvoice()} />
           </Box>
         </Paper>
 
