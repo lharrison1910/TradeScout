@@ -8,13 +8,16 @@ import Button from "../../components/Button/Button";
 import { useNewInvoice } from "../../hooks/Invoice/useNewInvoice";
 import RecentTable from "./RecentTable";
 import InvoiceModal from "../../components/InvoiceModal/InvoiceModal";
+import InvoicePreviewModal from "../../components/InvoicePreviewModal/InvoicePreviewModal";
 
 const Home = () => {
   const [expenseModal, setExpenseModal] = useState<boolean>(false);
   const [incomeModal, setIncomeModal] = useState<boolean>(false);
   const [invoiceModal, setInvoiceModal] = useState<boolean>(false);
+  const [invoiceBlob, setInvoiceBlob] = useState<Blob | null>(null);
 
   const { user } = useAuth();
+  const { mutateAsync: newInvoice } = useNewInvoice();
 
   const getFiscalQuarter = (
     startMonth: number,
@@ -50,6 +53,11 @@ const Home = () => {
   };
 
   const currentQuater = getFiscalQuarter(new Date().getMonth() + 1);
+
+  const handleNewInvoice = async (formData) => {
+    const blob = await newInvoice(formData);
+    setInvoiceBlob(blob);
+  };
 
   return (
     <>
@@ -143,6 +151,12 @@ const Home = () => {
       <InvoiceModal
         open={invoiceModal}
         handleClose={() => setInvoiceModal(false)}
+        handleSave={handleNewInvoice}
+      />
+
+      <InvoicePreviewModal
+        blob={invoiceBlob}
+        onClose={() => setInvoiceBlob(null)}
       />
     </>
   );

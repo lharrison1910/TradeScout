@@ -1,8 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { invoiceApiClient } from "../../api/InvoiceApiClient";
+import type { NewInvoiceRequestSchema } from "../../types/invoiceSchema";
 
 export const useNewInvoice = () =>
   useMutation({
     mutationKey: ["NewInvoice"],
-    mutationFn: () => invoiceApiClient.newInvoice(),
+    mutationFn: (payload: NewInvoiceRequestSchema) =>
+      invoiceApiClient.newInvoice(payload),
   });

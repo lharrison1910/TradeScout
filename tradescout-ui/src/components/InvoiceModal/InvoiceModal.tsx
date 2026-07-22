@@ -1,125 +1,86 @@
 import { useState } from "react";
 import Modal from "../Modal/Modal";
-import {
-  Autocomplete,
-  Box,
-  Divider,
-  Table,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { useAuth } from "../../hooks/useAuth/useAuth";
-import Button from "../Button/Button";
+import { Box, Divider } from "@mui/material";
 
-const InvoiceModal = ({ open, handleClose }) => {
-  const [formData, setFormData] = useState();
-  const { user } = useAuth();
+import type { NewInvoiceRequestSchema } from "../../types/invoiceSchema";
+import {
+  BankDetails,
+  CustomerDetails,
+  InvoiceDetails,
+  JobDetails,
+  MaterialsTable,
+  PaymentDetails,
+} from "./InvoiceForm";
+
+const InvoiceModal = ({ open, handleClose, handleSave }) => {
+  const initialFormState: NewInvoiceRequestSchema = {
+    businessId: "",
+    invoice_number: "",
+    invoice_date: new Date().toISOString().split("T")[0],
+    due_date: "",
+    customer_name: "",
+    customer_address: "",
+    customer_phone: "",
+    customer_email: "",
+    job_location: "",
+    job_reference: "",
+    materials: [],
+    subtotal: "0.00",
+    vat_rate: "20",
+    vat_amount: "0.00",
+    discount: "0.00",
+    amount_due: "0.00",
+    bank_name: "",
+    account_name: "",
+    sort_code: "",
+    account_number: "",
+    payment_terms_days: "14",
+  };
+  const [formData, setFormData] =
+    useState<NewInvoiceRequestSchema>(initialFormState);
+
+  const closeModal = () => {
+    setFormData(initialFormState);
+    handleClose();
+  };
+
+  const handleChange = (name: string, value: unknown) => {
+    setFormData({
+      ...formData,
+      [name]: value,
+      amount_due: String(
+        Number(formData.subtotal) +
+          Number(formData.vat_amount) -
+          Number(formData.discount),
+      ),
+    });
+  };
+
+  const saveInvoice = () => {
+    handleSave(formData);
+    closeModal();
+  };
 
   return (
     <Modal
       open={open}
-      handleClose={handleClose}
+      handleClose={closeModal}
       title="New Invoice"
-      handleSave={() => {}}
+      handleSave={() => saveInvoice()}
     >
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-          <Typography>Invoice Details</Typography>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-evenly",
-              width: "100%",
-            }}
-          >
-            <Autocomplete
-              options={user.businesses}
-              defaultValue={user.businesses[0]}
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => <TextField {...params} />}
-              sx={{ width: "50%" }}
-            />
-            <TextField placeholder="Invoice Number" sx={{ width: "50%" }} />
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-evenly",
-              width: "100%",
-            }}
-          >
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker label="Date issued" sx={{ width: "50%" }} />
-              <DatePicker label="Due date" sx={{ width: "50%" }} />
-            </LocalizationProvider>
-          </Box>
-        </Box>
+        <InvoiceDetails formData={formData} handleChange={handleChange} />
         <Divider />
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 0.5,
-          }}
-        >
-          <Typography>Customer Details</Typography>
-          <Box sx={{ justifyContent: "space-evenly" }}>
-            <TextField placeholder="Name" />
-            <TextField placeholder="Address" />
-          </Box>
-          <Box sx={{ justifyContent: "space-evenly" }}>
-            <TextField placeholder="Phone" />
-            <TextField placeholder="Email" />
-          </Box>
-        </Box>
+        <CustomerDetails formData={formData} handleChange={handleChange} />
         <Divider />
-        <Box sx={{ display: "flex" }}>
-          <Typography>Job Details</Typography>
-          <TextField placeholder="Location" />
-          <TextField placeholder="Reference" />
-        </Box>
+        <JobDetails formData={formData} handleChange={handleChange} />
         <Divider />
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Description</TableCell>
-              <TableCell>Quantity</TableCell>
-              <TableCell>Unit</TableCell>
-              <TableCell>Unit Price</TableCell>
-              <TableCell>Total</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody></TableBody>
-          <TableFooter
-            sx={{
-              display: "flex",
-              width: "100%",
-              justifyContent: "space-around",
-            }}
-          >
-            <Button title="Add Row" onClick={() => {}} />
-            <Typography>Total</Typography>
-          </TableFooter>
-        </Table>
+        <MaterialsTable />
         <Divider />
-        <Box sx={{ display: "flex" }}>
-          <Typography>Payment Details</Typography>
-          <TextField placeholder="Sub total" />
-          <TextField placeholder="VAT" />
-          <TextField placeholder="Discount" />
-          <TextField placeholder="Total" />
-        </Box>
+        <PaymentDetails formData={formData} handleChange={handleChange} />
         <Divider />
-        <Box>
-          <Typography>Bank Details</Typography>
-        </Box>
+        <BankDetails formData={formData} handleChange={handleChange} />
+        <Divider />
       </Box>
     </Modal>
   );
