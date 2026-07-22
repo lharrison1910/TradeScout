@@ -1,67 +1,19 @@
-import {
-  Box,
-  Paper,
-  Typography,
-  LinearProgress,
-  Divider,
-  TableHead,
-  TableCell,
-  TableBody,
-  TableRow,
-  Table,
-} from "@mui/material";
+import { Box, Paper, Typography, LinearProgress, Divider } from "@mui/material";
 import { SnapRecieptCard } from "../../components/SnapRecieptCard/SnapRecieptCard";
 import ExpenseModal from "../../components/ExpenseModal/ExpenseModal";
 import IncomeModal from "../../components/IncomeModal/IncomeModal";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth/useAuth";
 import Button from "../../components/Button/Button";
-import { useGetRecent } from "../../hooks/Business/useGetRecent/useGetRecent";
-import { useToast } from "../../hooks/useToast/useToast";
-import SkeletonTable from "../../components/Skeleton/SkeletonTable";
-import { NewInvoice } from "../../utils/NewInvoice";
-
-const RecentTable = () => {
-  const toast = useToast();
-  const { data: recent, isFetching, isPending, error } = useGetRecent();
-
-  useEffect(() => {
-    if (error) {
-      toast.error(error.message || "An error occurred while fetching data.");
-    }
-  }, [error, toast]);
-
-  if (isFetching || isPending || error) {
-    return <SkeletonTable />;
-  }
-
-  return (
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableCell>Amount</TableCell>
-          <TableCell>Type</TableCell>
-          <TableCell>Details</TableCell>
-          <TableCell>Date recieved</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {recent.map((row) => (
-          <TableRow key={row.id}>
-            <TableCell>£ {row.amount}</TableCell>
-            <TableCell>{row.type}</TableCell>
-            <TableCell>{row.reference || row.description}</TableCell>
-            <TableCell>{row.dateReceived.split("T")[0]}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
-};
+import { useNewInvoice } from "../../hooks/Invoice/useNewInvoice";
+import RecentTable from "./RecentTable";
+import InvoiceModal from "../../components/InvoiceModal/InvoiceModal";
 
 const Home = () => {
   const [expenseModal, setExpenseModal] = useState<boolean>(false);
   const [incomeModal, setIncomeModal] = useState<boolean>(false);
+  const [invoiceModal, setInvoiceModal] = useState<boolean>(false);
+
   const { user } = useAuth();
 
   const getFiscalQuarter = (
@@ -169,7 +121,7 @@ const Home = () => {
             <Button onClick={() => setIncomeModal(true)} title="Log Income" />
             <Button title="Log Expense" onClick={() => setExpenseModal(true)} />
 
-            <Button title="New Invoice" onClick={() => NewInvoice()} />
+            <Button title="New Invoice" onClick={() => setInvoiceModal(true)} />
           </Box>
         </Paper>
 
@@ -179,7 +131,6 @@ const Home = () => {
           <RecentTable />
         </Paper>
       </Box>
-
       <ExpenseModal
         open={expenseModal}
         handleClose={() => setExpenseModal(false)}
@@ -188,6 +139,10 @@ const Home = () => {
         open={incomeModal}
         handleClose={() => setIncomeModal(false)}
         data={undefined}
+      />
+      <InvoiceModal
+        open={invoiceModal}
+        handleClose={() => setInvoiceModal(false)}
       />
     </>
   );

@@ -9,6 +9,7 @@ import { SeedModule } from './seed/seed.module';
 import { HealthModule } from './Health/Health.module';
 import { BuisnessModule } from './Business/Business.module';
 import { UserModule } from './User/User.module';
+import { InvoiceModule } from './Invoice/Invoice.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { UserModule } from './User/User.module';
     HealthModule,
     BuisnessModule,
     UserModule,
+    InvoiceModule,
   ],
   controllers: [],
   providers: [],

@@ -61,7 +61,10 @@ export const executeSilentRefresh = async (
 export class BaseApi {
   constructor(readonly url = "http://localhost:3000/api") {}
 
-  private async request(path: string, options: RequestInit = {}): Promise<any> {
+  private async request(
+    path: string,
+    options: RequestInit = {},
+  ): Promise<Response> {
     const url = `${this.url}/${path}`;
     options.credentials = "include";
 
@@ -136,11 +139,12 @@ export class BaseApi {
       throw new Error(res.statusText);
     }
 
-    return res.json();
+    return res;
   }
 
   async get(url: string) {
-    return this.request(url, { method: "GET" });
+    const res = await this.request(url, { method: "GET" });
+    return await res.json();
   }
 
   async post(url: string, body: string | FormData) {
@@ -148,12 +152,13 @@ export class BaseApi {
     if (typeof body === "string") {
       headers["Content-Type"] = "application/json";
     }
-
-    return this.request(url, {
+    const res = await this.request(url, {
       method: "POST",
       body,
       headers,
     });
+
+    return await res.json();
   }
 
   async put(url: string, body: string) {
@@ -161,14 +166,31 @@ export class BaseApi {
       "Content-Type": "application/json",
     };
 
-    return this.request(url, {
+    const res = await this.request(url, {
       method: "PUT",
       body,
       headers,
     });
+
+    return await res.json();
   }
 
   async delete(url: string) {
-    return this.request(url);
+    const res = await this.request(url);
+    return await res.json();
+  }
+
+  async blob(url: string, body: string) {
+    const headers: Record<string, string> = {};
+    if (typeof body === "string") {
+      headers["Content-Type"] = "application/json";
+    }
+    const res = await this.request(url, {
+      method: "POST",
+      body,
+      headers,
+    });
+
+    return await res.blob();
   }
 }
