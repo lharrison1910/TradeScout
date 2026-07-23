@@ -5,12 +5,14 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { MtdIncomeCategory } from './IncomeCategory';
 import { User } from 'src/User/User.entity';
 import { Business } from 'src/Business/Business.entity';
+import { Invoice } from 'src/Invoice/Invoice.entity';
 
 @Entity('Income')
 export class Income {
@@ -61,4 +63,7 @@ export class Income {
   @ManyToOne(() => Business, (business) => business.income)
   @JoinColumn({ name: 'businessId' })
   business: Business;
+
+  @OneToOne(() => Invoice, (invoice) => invoice.income)
+  invoice: Invoice;
 }
