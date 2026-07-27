@@ -9,8 +9,9 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { MtdExpenseCategory } from './ExpernseCategory';
-import { User } from 'src/User/User.entity';
-import { Business } from 'src/Business/Business.entity';
+import { User } from '../User/User.entity';
+import { Business } from '../Business/Business.entity';
+import { Invoice } from '../Invoice/Invoice.entity';
 
 @Entity('Expense')
 export class Expense {
@@ -64,4 +65,13 @@ export class Expense {
   @ManyToOne(() => Business, (business) => business.expense)
   @JoinColumn({ name: 'businessId' })
   business: Business;
+
+
+  @Column({type: 'integer', nullable: true})
+  invoiceId: number
+
+  @ManyToOne(()=> Invoice, (invoice) => invoice.jobExpenses)
+  @JoinColumn({name: 'invoiceId'})
+  invoice: Invoice
+
 }

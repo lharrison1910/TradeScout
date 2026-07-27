@@ -1,3 +1,4 @@
+import { Invoice } from '../Invoice/Invoice.entity';
 import { Expense } from '../Expense/Expense.entity';
 import { Income } from '../Income/Income.entity';
 import { User } from '../User/User.entity';
@@ -43,4 +44,7 @@ export class Business {
 
   @ManyToOne(() => User, (user) => user.businesses)
   user: User;
+
+  @OneToMany(() => Invoice, (invoice) => invoice.business)
+  invoices: Invoice[];
 }

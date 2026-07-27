@@ -1,11 +1,15 @@
-type MaterialDto = {
+// import { InvoiceStatusEnum } from "../Invoice/InvoiceEnums";
+
+import { InvoiceStatusEnum } from "src/Invoice/InvoiceEnums";
+
+interface MaterialDto  {
   description: string;
   quantity: number;
   unit: string;
   unit_price: number;
   line_total: number;
 };
-export type NewInvoiceRequestSchema = {
+export interface InvoiceDto  {
   businessId: string;
   invoice_number: string;
   invoice_date: string;
@@ -33,3 +37,12 @@ export type NewInvoiceRequestSchema = {
   account_number: string;
   payment_terms_days: string;
 };
+
+export interface NewInvoiceRequestSchema {
+  businessId: string
+  customerName:string
+  totalAmount: number;
+  status: InvoiceStatusEnum;
+  snapshotData: InvoiceDto;
+
+}
