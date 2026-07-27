@@ -1,52 +1,17 @@
-import {
-  AccountCircle,
-  DarkMode,
-  Home,
-  LightMode,
-  Logout,
-  Settings,
-  TrendingDown,
-  TrendingUp,
-} from "@mui/icons-material";
-import {
-  AppBar,
-  Autocomplete,
-  Box,
-  IconButton,
-  Menu,
-  MenuItem,
-  TextField,
-  Typography,
-} from "@mui/material";
-import Button from "../../components/Button/Button";
-import { useNavigate } from "@tanstack/react-router";
+import { DarkMode, LightMode, Logout } from "@mui/icons-material";
+import { AppBar, Box, IconButton, Typography } from "@mui/material";
 import { useState } from "react";
 import { useTheme } from "../../hooks/useTheme/useTheme";
-import { useAuth } from "../../hooks/useAuth/useAuth";
 import { useLogout } from "../../hooks/User/useLogout/useLogout";
+import MenuIcon from "@mui/icons-material/Menu";
+import Sidebar from "../Sidebar/Sidebar";
 
 const Navbar = () => {
-  const navigate = useNavigate();
   const { toggleTheme, mode } = useTheme();
-  const { user } = useAuth();
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const open = Boolean(anchorEl);
+
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   const { mutate: onLogout } = useLogout();
-
-  const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) =>
-    setAnchorEl(event.currentTarget);
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleMenuClick = (path: string) => {
-    navigate({
-      to: `/${path}`,
-    });
-    handleClose();
-  };
 
   return (
     <AppBar
@@ -60,38 +25,10 @@ const Navbar = () => {
         marginBottom: 2,
       }}
     >
-      <Box sx={{ display: "flex" }}>
-        <Button
-          title=""
-          sx={{ color: "white" }}
-          onClick={() => navigate({ to: "/" })}
-          endIcon={<Home />}
-        />
-
-        <Button
-          title=""
-          sx={{ color: "white" }}
-          onClick={() =>
-            navigate({
-              to: "/income",
-            })
-          }
-          endIcon={<TrendingUp />}
-        />
-
-        <Button
-          title=""
-          sx={{ color: "white" }}
-          onClick={() => navigate({ to: "/expense" })}
-          endIcon={<TrendingDown />}
-        />
-        <Autocomplete
-          options={user.businesses}
-          defaultValue={user.businesses[0]}
-          getOptionLabel={(option) => option.name}
-          renderInput={(params) => <TextField {...params} />}
-        />
-      </Box>
+      <IconButton onClick={() => setSidebarOpen(true)}>
+        <MenuIcon />
+      </IconButton>
+      <Sidebar open={sidebarOpen} handleClose={() => setSidebarOpen(false)} />
 
       <Typography>TradeScout</Typography>
 
@@ -99,17 +36,9 @@ const Navbar = () => {
         <IconButton onClick={() => toggleTheme()}>
           {mode === "light" ? <LightMode /> : <DarkMode />}
         </IconButton>
-        <IconButton onClick={handleOpen}>
-          <AccountCircle />
+        <IconButton onClick={() => onLogout()}>
+          <Logout />
         </IconButton>
-        <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-          <MenuItem onClick={() => handleMenuClick("settings")}>
-            Settings <Settings />
-          </MenuItem>
-          <MenuItem onClick={() => onLogout()}>
-            Log out <Logout />
-          </MenuItem>
-        </Menu>
       </Box>
     </AppBar>
   );
