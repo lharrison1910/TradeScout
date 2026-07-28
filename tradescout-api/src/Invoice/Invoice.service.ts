@@ -35,6 +35,7 @@ export class InvoiceService {
 
   async createDraft(payload:NewInvoiceRequestSchema, currentUser:CurrentUserType){
     let business: Business | null = null
+    console.log(currentUser.userId, "user id")
     
     try{
       business = await this.dataSource.getRepository(Business).findOne({where: {userId: currentUser.userId }})
