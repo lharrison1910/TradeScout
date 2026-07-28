@@ -17,6 +17,26 @@ class InvoiceApiClient extends BaseApi {
 
     return await this.blob(`${this.invoice}`, body);
   }
+
+  async createInvoice(payload) {
+    const body = JSON.stringify(payload);
+
+    return await this.post(`${this.invoice}/draft`, body);
+  }
+
+  async updateDraft(payload) {
+    const body = JSON.stringify(payload);
+
+    return await this.put(`${this.invoice}/${payload.id}/preview`, body);
+  }
+
+  async getPreview(id: number) {
+    return await this.blob(`${this.invoice}/${id}/preview`);
+  }
+
+  async deleteInvoice(id: number) {
+    return await this.delete(`${this.invoice}/${id}`);
+  }
 }
 
 export const invoiceApiClient = InvoiceApiClient.getInstance();
