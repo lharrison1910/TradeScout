@@ -34,7 +34,7 @@ export class BusinessService {
         where: findOptions,
       });
     } catch (error) {
-      console.log(error);
+      this.logger.error(`getBusiness: failed to get businesses - ${error}`)
       throw new InternalServerErrorException('Failed to fetch businesses');
     }
 
@@ -128,7 +128,8 @@ export class BusinessService {
 
       return business;
     } catch (error) {
-      console.log(error);
+
+      this.logger.error(`addBusiness: failed to save business - ${error}`)
       throw new InternalServerErrorException('Failed to save business');
     }
   }

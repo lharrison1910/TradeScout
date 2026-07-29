@@ -33,12 +33,9 @@ export const executeSilentRefresh = async (
   baseUrl: string,
 ): Promise<string> => {
   if (activeRefreshPromise) {
-    console.log("👥 Refresh already in progress. Merging duplicate calls...");
     const result = await activeRefreshPromise;
     return result.accessToken;
   }
-
-  console.log("🔄 Starting fresh silent refresh network request...");
 
   activeRefreshPromise = fetch(`${baseUrl}/auth/refresh`, {
     method: "POST",
@@ -77,7 +74,6 @@ export class BaseApi {
     }
     options.headers = headers;
 
-    console.log(`📡 Sending request to: ${path}`);
     const res = await fetch(url, options);
 
     if (res.status === 401) {
@@ -87,10 +83,8 @@ export class BaseApi {
 
       if (!isRefreshing) {
         isRefreshing = true;
-        console.log("🔄 Access Token expired. Attempting silent refresh...");
 
         try {
-          // 🚀 FIXED: Hardcoded 'auth' so child classes like BusinessApiClient don't break this url
           const refreshRes = await fetch(`${this.url}/auth/refresh`, {
             method: "POST",
             credentials: "include",
@@ -102,13 +96,11 @@ export class BaseApi {
           inMemoryToken = data.accessToken;
           isRefreshing = false;
 
-          console.log("✅ Refresh successful! Flushing queued requests.");
           onTokenRefreshed(data.accessToken);
         } catch (err) {
           isRefreshing = false;
           inMemoryToken = null;
 
-          console.log("❌ Refresh failed. Rejecting queued requests.");
           onRefreshFailed(err);
 
           window.location.href = "/login";
