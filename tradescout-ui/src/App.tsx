@@ -23,7 +23,6 @@ const App = () => {
   const auth = useAuth();
 
   useEffect(() => {
-    console.log("🔒 Auth state changed, invalidating router...");
     router.invalidate();
   }, [auth.user, auth.loading]);
 
