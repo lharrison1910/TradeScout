@@ -1,16 +1,16 @@
-type MaterialDto = {
+import type { Dayjs } from "dayjs";
+
+export type MaterialDto = {
   description: string;
   quantity: number;
-  unit: string;
   unit_price: number;
   line_total: number;
 };
 
 export type InvoiceDetails = {
-  businessId: string;
   invoice_number: string;
-  invoice_date: string;
-  due_date: string;
+  invoice_date: Dayjs;
+  due_date: Dayjs;
 };
 
 export type InvoiceCustomerDetails = {

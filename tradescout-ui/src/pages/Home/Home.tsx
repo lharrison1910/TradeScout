@@ -54,11 +54,6 @@ const Home = () => {
 
   const currentQuater = getFiscalQuarter(new Date().getMonth() + 1);
 
-  const handleNewInvoice = async (formData) => {
-    const blob = await newInvoice(formData);
-    setInvoiceBlob(blob);
-  };
-
   return (
     <>
       <Box
@@ -151,7 +146,6 @@ const Home = () => {
       <InvoiceModal
         open={invoiceModal}
         handleClose={() => setInvoiceModal(false)}
-        handleSave={handleNewInvoice}
       />
 
       <InvoicePreviewModal

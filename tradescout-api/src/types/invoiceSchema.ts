@@ -1,5 +1,3 @@
-// import { InvoiceStatusEnum } from "../Invoice/InvoiceEnums";
-
 import { InvoiceStatusEnum } from "src/Invoice/InvoiceEnums";
 
 interface MaterialDto  {
@@ -10,7 +8,6 @@ interface MaterialDto  {
   line_total: number;
 };
 export interface InvoiceDto  {
-  businessId: string;
   invoice_number: string;
   invoice_date: string;
   due_date: string;
@@ -40,9 +37,7 @@ export interface InvoiceDto  {
 
 export interface NewInvoiceRequestSchema {
   businessId: string
-  customerName:string
   totalAmount: number;
   status: InvoiceStatusEnum;
   snapshotData: InvoiceDto;
-
 }

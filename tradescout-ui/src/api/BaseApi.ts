@@ -1,22 +1,26 @@
+let inMemoryToken: string | null = null;
 let isRefreshing = false;
-let activeRefreshPromise: Promise<void> | null = null;
+let activeRefreshPromise: Promise<{ accessToken: string }> | null = null;
 
 interface QueuedRequest {
-  resolve: (res: Response) => void;
+  resolve: (token: string) => void;
   reject: (err: any) => void;
 }
 let refreshSubscribers: QueuedRequest[] = [];
 
+export const setAccessToken = (token: string | null) => {
+  inMemoryToken = token;
+};
+
 const subscribeTokenRefresh = (
-  resolve: (res: Response) => void,
+  resolve: (token: string) => void,
   reject: (err: any) => void,
 ) => {
   refreshSubscribers.push({ resolve, reject });
 };
 
-const onTokenRefreshed = () => {
-  // We no longer need to pass a token! Just tell the queued requests to retry.
-  refreshSubscribers.forEach((sub) => sub.resolve(new Response()));
+const onTokenRefreshed = (token: string) => {
+  refreshSubscribers.forEach((sub) => sub.resolve(token));
   refreshSubscribers = [];
 };
 
@@ -25,9 +29,9 @@ const onRefreshFailed = (error: any) => {
   refreshSubscribers = [];
 };
 
-// 🚀 If you call this on app mount, it no longer needs to return a string.
-// The browser just silently gets the new cookie and saves it.
-export const executeSilentRefresh = async (baseUrl: string): Promise<void> => {
+export const executeSilentRefresh = async (
+  baseUrl: string,
+): Promise<string> => {
   if (activeRefreshPromise) {
     const result = await activeRefreshPromise;
     return result.accessToken;
@@ -35,13 +39,17 @@ export const executeSilentRefresh = async (baseUrl: string): Promise<void> => {
 
   activeRefreshPromise = fetch(`${baseUrl}/auth/refresh`, {
     method: "POST",
-    credentials: "include", // This tells the browser to send the refresh cookie
-  }).then((res) => {
+    credentials: "include",
+  }).then(async (res) => {
     if (!res.ok) throw new Error("Refresh failed");
+    return res.json();
   });
 
   try {
-    await activeRefreshPromise;
+    const data = await activeRefreshPromise;
+    inMemoryToken = data.accessToken;
+    setAccessToken(data.accessToken);
+    return data.accessToken;
   } finally {
     activeRefreshPromise = null;
   }
@@ -55,16 +63,21 @@ export class BaseApi {
     options: RequestInit = {},
   ): Promise<Response> {
     const url = `${this.url}/${path}`;
-
     options.credentials = "include";
 
-    const headers = { ...options.headers } as Record<string, string>;
+    const headers = {
+      ...options.headers,
+    } as Record<string, string>;
+
+    if (inMemoryToken) {
+      headers["Authorization"] = `Bearer ${inMemoryToken}`;
+    }
     options.headers = headers;
 
     const res = await fetch(url, options);
 
     if (res.status === 401) {
-      if (path.includes("/refresh") || path.includes("/login")) {
+      if (path.includes("/refresh")) {
         throw new Error("Session expired");
       }
 
@@ -79,6 +92,8 @@ export class BaseApi {
 
           if (!refreshRes.ok) throw new Error("Refresh expired");
 
+          const data = await refreshRes.json();
+          inMemoryToken = data.accessToken;
           isRefreshing = false;
 
           onTokenRefreshed(data.accessToken);
@@ -87,6 +102,7 @@ export class BaseApi {
           inMemoryToken = null;
 
           onRefreshFailed(err);
+
           window.location.href = "/login";
           throw err;
         }
@@ -94,14 +110,12 @@ export class BaseApi {
 
       return new Promise((resolve, reject) => {
         subscribeTokenRefresh(
-          async () => {
+          async (newToken) => {
             try {
-              // Retry the request. The browser automatically uses the NEW cookie!
-              const retryRes = await fetch(url, options);
+              headers["Authorization"] = `Bearer ${newToken}`;
+              const retryRes = await fetch(url, { ...options, headers });
               if (!retryRes.ok) throw new Error(retryRes.statusText);
-
-              // 🚀 FIXED BUG: Resolve the raw Response object, so your get/post methods don't crash
-              resolve(retryRes);
+              resolve(await retryRes.json());
             } catch (retryErr) {
               reject(retryErr);
             }
@@ -135,6 +149,7 @@ export class BaseApi {
       body,
       headers,
     });
+
     return await res.json();
   }
 
@@ -142,29 +157,32 @@ export class BaseApi {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
+
     const res = await this.request(url, {
       method: "PUT",
       body,
       headers,
     });
+
     return await res.json();
   }
 
   async delete(url: string) {
-    const res = await this.request(url, { method: "DELETE" });
+    const res = await this.request(url);
     return await res.json();
   }
 
-  async blob(url: string, body?: string) {
+  async blob(url: string, body: string) {
     const headers: Record<string, string> = {};
     if (typeof body === "string") {
       headers["Content-Type"] = "application/json";
     }
     const res = await this.request(url, {
-      method: body ? "POST" : "GET",
+      method: "POST",
       body,
       headers,
     });
+
     return await res.blob();
   }
 }

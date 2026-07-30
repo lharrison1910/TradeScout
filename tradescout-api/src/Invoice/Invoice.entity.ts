@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
 import { InvoiceStatusEnum } from './InvoiceEnums';
-import { Business } from 'src/Business/Business.entity';
-import { Expense } from 'src/Expense/Expense.entity';
-import { Income } from 'src/Income/Income.entity';
+import { Business } from '../Business/Business.entity';
+import { Expense } from '../Expense/Expense.entity';
+import { Income } from '../Income/Income.entity';
 
 @Entity('invoices')
 export class Invoice {
@@ -23,9 +23,6 @@ export class Invoice {
 
   @Column({type: 'jsonb', nullable: true})
   snapshotData: Record<string, any>;
-
-    @Column({nullable: true})
-  fileUrl?: string
 
   @Column({ type: 'timestamp', nullable: true })
   issuedAt: Date;
