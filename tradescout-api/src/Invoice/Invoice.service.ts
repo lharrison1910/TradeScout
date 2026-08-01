@@ -9,7 +9,7 @@ import path from 'path';
 import fs from 'fs';
 import PizZip from 'pizzip';
 import Docxtemplater from 'docxtemplater';
-import { NewInvoiceRequestSchema } from '../types/invoiceSchema';
+import { InvoiceDto, NewInvoiceRequestSchema } from '../types/invoiceSchema';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Invoice } from './Invoice.entity';
 import { Repository } from 'typeorm';
@@ -33,21 +33,35 @@ export class InvoiceService {
     private readonly logger: PinoLogger,
   ) {}
 
-  async createDraft(payload:NewInvoiceRequestSchema, currentUser:CurrentUserType){
+  async createDraft(payload, currentUser:CurrentUserType){
+    console.log(payload, "test payload")
     let business: Business | null = null
     
     try{
-      business = await this.dataSource.getRepository(Business).findOne({where: {userId: currentUser.userId }})
+      business = await this.dataSource.getRepository(Business).findOne({where: {
+        id:payload.businessId,
+        userId: currentUser.userId }})
     } catch(error){
       this.logger.error(`createDraft: failed to find business - ${error}`)
+      throw new InternalServerErrorException("Failed to find business")
     }
 
     if(!business){
       throw new UnauthorizedException("You do not have permission to create an invoice for this business")
     }
 
+
     try{
-      const invoiceToSave = this.invoiceRepository.create({...payload, status: InvoiceStatusEnum.DRAFT})
+      const snapshotData:InvoiceDto = {...payload}
+      const formattedInvoice = {
+        businessId: payload.businessId, 
+        invoiceNumber: payload.invoice_number,
+        customerName: payload.customer_name,
+        totalAmount: payload.amount_due,
+        status: InvoiceStatusEnum.DRAFT,
+        snapshotData
+      }
+      const invoiceToSave = this.invoiceRepository.create(formattedInvoice)
       return await this.invoiceRepository.save(invoiceToSave)
     } catch(error){
       this.logger.error(`createDraft: failed to save to db - ${error}`)

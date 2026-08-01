@@ -22,7 +22,7 @@ const Modal: FC<PropsWithChildren<ModalProps>> = ({
   };
 
   return (
-    <Dialog open={open} onClose={closeModal}>
+    <Dialog open={open} onClose={closeModal} sx={{ maxWidth: "75%" }}>
       <DialogTitle>
         <Button
           title="Back"
@@ -45,8 +45,8 @@ const Modal: FC<PropsWithChildren<ModalProps>> = ({
             marginTop: 1,
           }}
         >
-          <Button title="Save" onClick={handleSave} />
           <Button title="Cancel" onClick={handleClose} />
+          <Button title="Save" onClick={handleSave} />
         </Box>
       </DialogContent>
     </Dialog>
