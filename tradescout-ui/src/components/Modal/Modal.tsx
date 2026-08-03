@@ -22,7 +22,17 @@ const Modal: FC<PropsWithChildren<ModalProps>> = ({
   };
 
   return (
-    <Dialog open={open} onClose={closeModal} sx={{ maxWidth: "75%" }}>
+    <Dialog
+      open={open}
+      onClose={closeModal}
+      fullWidth
+      maxWidth="lg"
+      slotProps={{
+        paper: {
+          sx: { width: "75%", maxWidth: "none" },
+        },
+      }}
+    >
       <DialogTitle>
         <Button
           title="Back"
@@ -35,7 +45,7 @@ const Modal: FC<PropsWithChildren<ModalProps>> = ({
         {title}
       </DialogTitle>
       <DialogContent>
-        <Box>{children}</Box>
+        <Box sx={{ width: "100%" }}>{children}</Box>
 
         <Box
           sx={{

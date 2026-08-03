@@ -64,6 +64,6 @@ export class Income {
   @JoinColumn({ name: 'businessId' })
   business: Business;
 
-  @OneToOne(() => Invoice, (invoice) => invoice.payments)
+  @ManyToOne(() => Invoice, (invoice) => invoice.income)
   invoice: Invoice;
 }

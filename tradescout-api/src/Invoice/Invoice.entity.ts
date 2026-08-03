@@ -48,8 +48,8 @@ export class Invoice {
   businessId: string;
 
   @OneToMany(() => Income, (income) => income.invoice)
-  payments: Income[];
+  income: Income[];
 
   @OneToMany(() => Expense, (expense) => expense.invoice)
-  jobExpenses: Expense[];
+  expenses: Expense[];
 }

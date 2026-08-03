@@ -1,72 +1,67 @@
-import { useEffect, useRef } from "react";
-import { renderAsync } from "docx-preview";
-
 interface InvoicePreviewModalProps {
   blob: Blob | null;
+  open: boolean;
   onClose: () => void;
 }
 
-const InvoicePreviewModal = ({ blob, onClose }: InvoicePreviewModalProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+import { renderAsync } from "docx-preview";
+import { Box } from "@mui/material";
+import Modal from "../Modal/Modal";
 
-  useEffect(() => {
-    if (blob && containerRef.current) {
-      containerRef.current.innerHTML = "";
+export const InvoicePreviewModal = ({
+  blob,
+  open,
+  onClose,
+}: InvoicePreviewModalProps) => {
+  const handleRef = (element: HTMLDivElement | null) => {
+    if (element && blob && open) {
+      element.innerHTML = "";
 
-      renderAsync(blob, containerRef.current, undefined, {
+      renderAsync(blob, element, undefined, {
         className: "docx-viewer",
         inWrapper: true,
         ignoreWidth: false,
         ignoreHeight: false,
-      }).catch((err) => console.error("Error rendering docx:", err));
+      })
+        .then(() => console.log("DOCX Rendered successfully on screen!"))
+        .catch((err) => console.error("Error rendering docx:", err));
     }
-  }, [blob]);
+  };
 
   if (!blob) return null;
 
   return (
-    <div style={modalOverlayStyle}>
-      <div style={modalContentStyle}>
-        <div style={headerStyle}>
-          <h3>Invoice Preview (.docx)</h3>
-          <button onClick={onClose}>Close</button>
-        </div>
-
-        <div
-          ref={containerRef}
-          style={{ overflowY: "auto", maxHeight: "80vh" }}
+    <Modal
+      open={open}
+      handleClose={onClose}
+      title={"Preview"}
+      handleSave={undefined}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "20px",
+          borderRadius: "8px",
+          width: "100%",
+        }}
+      >
+        <Box
+          ref={handleRef}
+          sx={{
+            overflowY: "auto",
+            maxHeight: "80vh",
+            minHeight: "500px",
+            width: "100%",
+            backgroundColor: "#fff",
+            "& .docx-wrapper": {
+              background: "transparent",
+              padding: 0,
+            },
+          }}
         />
-      </div>
-    </div>
+      </Box>
+    </Modal>
   );
 };
-
-const modalOverlayStyle: React.CSSProperties = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundColor: "rgba(0, 0, 0, 0.6)",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  zIndex: 1000,
-};
-
-const modalContentStyle: React.CSSProperties = {
-  background: "#fff",
-  padding: "20px",
-  borderRadius: "8px",
-  width: "80%",
-  maxWidth: "900px",
-};
-
-const headerStyle: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: "10px",
-};
-
-export default InvoicePreviewModal;

@@ -1,10 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { invoiceApiClient } from "../../api/InvoiceApiClient";
 import type { NewInvoiceRequestSchema } from "../../types/invoiceSchema";
 import { useAuth } from "../useAuth/useAuth";
 
 export const useNewInvoice = () => {
   const { selectedBusiness } = useAuth();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["NewInvoice"],
     mutationFn: (payload: NewInvoiceRequestSchema) =>
@@ -12,5 +13,8 @@ export const useNewInvoice = () => {
         ...payload,
         businessId: selectedBusiness,
       }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["useGetInvoice"] });
+    },
   });
 };

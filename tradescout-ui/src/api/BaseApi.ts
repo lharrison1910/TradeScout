@@ -172,14 +172,11 @@ export class BaseApi {
     return await res.json();
   }
 
-  async blob(url: string, body: string) {
+  async blob(url: string) {
     const headers: Record<string, string> = {};
-    if (typeof body === "string") {
-      headers["Content-Type"] = "application/json";
-    }
+
     const res = await this.request(url, {
-      method: "POST",
-      body,
+      method: "GET",
       headers,
     });
 

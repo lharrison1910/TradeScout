@@ -205,7 +205,7 @@ export class InvoiceService {
   async getJobDetails(invoiceId:number){
     let invoice: Invoice|null
     try{
-      invoice = await this.invoiceRepository.findOne({where: {id: invoiceId}, relations: {jobExpenses: true, payments: true}})
+      invoice = await this.invoiceRepository.findOne({where: {id: invoiceId}, relations: {expenses: true, income: true}})
     }
     catch(error){
       this.logger.error(`updateDraft: failed to load ${invoiceId} in DB - ${error}`)
@@ -259,7 +259,7 @@ export class InvoiceService {
   async voidInvoice(invoiceId:number){
     let invoice: Invoice|null
     try{
-      invoice = await this.invoiceRepository.findOne({where: {id: invoiceId}, relations: {jobExpenses: true, payments: true}})
+      invoice = await this.invoiceRepository.findOne({where: {id: invoiceId}, relations: {expenses: true, income: true}})
     }
     catch(error){
       this.logger.error(`updateDraft: failed to load ${invoiceId} in DB - ${error}`)
@@ -280,10 +280,10 @@ export class InvoiceService {
         await invoiceRepo.update(invoice.id, {...invoice, status: InvoiceStatusEnum.VOID})
         await invoiceRepo.softDelete(invoice.id)
 
-        const incomeIds = invoice.payments.map((income) => income.id)
+        const incomeIds = invoice.income.map((income) => income.id)
         await incomeRepo.softDelete(incomeIds)
 
-        const expenseIds = invoice.jobExpenses.map((expense) => expense.id)
+        const expenseIds = invoice.expenses.map((expense) => expense.id)
         await expenseRepo.softDelete(expenseIds)
       })
     } catch(error){
@@ -299,7 +299,7 @@ export class InvoiceService {
 
   async listInvoiceByFilter(filter){
     try{
-      return  await this.invoiceRepository.find({relations: {jobExpenses: true, payments: true}})
+      return  await this.invoiceRepository.find({relations: {expenses: true, income:true, business: true}})
     }
     catch(error){
       this.logger.error(`listInvoiceByFilter: failed to load from DB - ${error}`)

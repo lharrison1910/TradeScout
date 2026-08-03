@@ -1,4 +1,4 @@
-import type { NewInvoiceRequestSchema } from "../types/invoiceSchema";
+// import type { NewInvoiceRequestSchema } from "../types/invoiceSchema";
 import { BaseApi } from "./BaseApi";
 
 class InvoiceApiClient extends BaseApi {
@@ -12,30 +12,45 @@ class InvoiceApiClient extends BaseApi {
     return InvoiceApiClient.instance;
   }
 
-  async newInvoice(payload: NewInvoiceRequestSchema) {
-    const body = JSON.stringify(payload);
-
-    return await this.blob(`${this.invoice}`, body);
-  }
-
   async createInvoice(payload) {
     const body = JSON.stringify(payload);
 
     return await this.post(`${this.invoice}/draft`, body);
   }
 
-  async updateDraft(payload) {
+  async udpdateDraft(payload) {
     const body = JSON.stringify(payload);
 
-    return await this.put(`${this.invoice}/${payload.id}/preview`, body);
+    return await this.put(`${this.invoice}/${payload.id}/draft`, body);
   }
 
   async getPreview(id: number) {
     return await this.blob(`${this.invoice}/${id}/preview`);
   }
 
-  async deleteInvoice(id: number) {
+  async deleteDraft(id: number) {
     return await this.delete(`${this.invoice}/${id}`);
+  }
+
+  async issueInvoice(id: number) {
+    return await this.post(`${this.invoice}/${id}/issue`, "");
+  }
+
+  async downloadInvoice(id: number) {
+    console.log("Not working");
+    return await this.get(`${this.invoice}/${id}/download`);
+  }
+
+  async getInvoicesByQuery() {
+    return await this.get(this.invoice);
+  }
+
+  async payInvoice(id: number) {
+    return await this.post(`${this.invoice}/${id}/pay`, "");
+  }
+
+  async voidInvoice(id: number) {
+    return await this.post(`${this.invoice}/${id}/void`, "");
   }
 }
 

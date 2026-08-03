@@ -5,10 +5,9 @@ import IncomeModal from "../../components/IncomeModal/IncomeModal";
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth/useAuth";
 import Button from "../../components/Button/Button";
-import { useNewInvoice } from "../../hooks/Invoice/useNewInvoice";
 import RecentTable from "./RecentTable";
 import InvoiceModal from "../../components/InvoiceModal/InvoiceModal";
-import InvoicePreviewModal from "../../components/InvoicePreviewModal/InvoicePreviewModal";
+import { InvoicePreviewModal } from "../../components/InvoicePreviewModal/InvoicePreviewModal";
 
 const Home = () => {
   const [expenseModal, setExpenseModal] = useState<boolean>(false);
@@ -17,7 +16,6 @@ const Home = () => {
   const [invoiceBlob, setInvoiceBlob] = useState<Blob | null>(null);
 
   const { user } = useAuth();
-  const { mutateAsync: newInvoice } = useNewInvoice();
 
   const getFiscalQuarter = (
     startMonth: number,

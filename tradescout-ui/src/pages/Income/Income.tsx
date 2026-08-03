@@ -1,11 +1,4 @@
-import {
-  Autocomplete,
-  // Autocomplete,
-  Box,
-  CircularProgress,
-  TextField,
-  // TextField,
-} from "@mui/material";
+import { Autocomplete, Box, CircularProgress, TextField } from "@mui/material";
 import { useGetIncome } from "../../hooks/useGetIncome/useGetIncome";
 import Grid from "../../components/Grid/Grid";
 import { columns } from "./columns";
@@ -14,7 +7,6 @@ import { useState } from "react";
 import IncomeModal from "../../components/IncomeModal/IncomeModal";
 import DeleteModal from "../../components/DeleteModal/DeleteModal";
 import { useGetUser } from "../../hooks/User/useGetUser/useGetUser";
-// import { useGetBusiness } from "../../hooks/Business/useGetBusiness/useGetBusiness";
 
 const IncomePage = () => {
   const [editData, setEditData] = useState();

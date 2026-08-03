@@ -70,7 +70,7 @@ export class Expense {
   @Column({type: 'integer', nullable: true})
   invoiceId: number
 
-  @ManyToOne(()=> Invoice, (invoice) => invoice.jobExpenses)
+  @ManyToOne(()=> Invoice, (invoice) => invoice.expenses)
   @JoinColumn({name: 'invoiceId'})
   invoice: Invoice
 
