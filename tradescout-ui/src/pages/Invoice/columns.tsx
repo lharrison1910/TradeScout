@@ -13,6 +13,36 @@ export const columns = (getPreview, payInvoice): GridColDef[] => [
     renderCell: (params) => {
       const [anchorEl, setAnchorEl] = useState<ReactElement | null>(null);
       const open = Boolean(anchorEl);
+      const menuItems = [
+        { title: "Issue", onClick: () => {} },
+        { title: "Paid", onClick: () => payInvoice(params.row.id) },
+        { title: "Edit", onClick: () => {} },
+        { title: "Void", onClick: () => {} },
+        { title: "Delete", onClick: () => {} },
+        { title: "Download", onClick: () => {} },
+        { title: "Preview", onClick: () => getPreview(params.row.id) },
+      ];
+
+      const filteredMenuItems = menuItems.filter((item) => {
+        const status = params.row.status;
+        const title = item.title;
+
+        if (status === "PAID") {
+          if (["Issue", "Paid", "Edit", "Delete"].includes(title)) {
+            return false;
+          }
+        } else if (status === "DRAFT") {
+          if (title === "Void") {
+            return false;
+          }
+        } else {
+          if (["Delete", "Edit"].includes(title)) {
+            return false;
+          }
+        }
+
+        return true;
+      });
 
       const handleButtonClick = (
         event: React.MouseEvent<HTMLButtonElement>,
@@ -30,7 +60,12 @@ export const columns = (getPreview, payInvoice): GridColDef[] => [
             <MoreVertOutlined />
           </IconButton>
           <Menu open={open} onClose={handleClose} anchorEl={anchorEl}>
-            <MenuItem>Issue</MenuItem>
+            {filteredMenuItems.map((row) => (
+              <MenuItem key={row.title} onClick={row.onClick}>
+                {row.title}
+              </MenuItem>
+            ))}
+            {/* <MenuItem>Issue</MenuItem>
             <MenuItem onClick={() => payInvoice(params.row.id)}>Paid</MenuItem>
             <MenuItem>Edit</MenuItem>
             <MenuItem>
@@ -39,11 +74,12 @@ export const columns = (getPreview, payInvoice): GridColDef[] => [
             <MenuItem>Download</MenuItem>
             <MenuItem onClick={() => getPreview(params.row.id)}>
               Preview
-            </MenuItem>
+            </MenuItem> */}
           </Menu>
         </>
       );
     },
+    width: 15,
   },
   {
     field: "invoiceNumber",
@@ -82,7 +118,7 @@ export const columns = (getPreview, payInvoice): GridColDef[] => [
     headerName: "Date issued",
     renderCell(params) {
       if (params.row.issuedAt) {
-        return <>{params.row.issuedAt.split("T")[0]}</>;
+        return <>{dayjs(params.row.issuedAt).format("DD/MM/YYYY")}</>;
       } else {
         return <>Not yet issued</>;
       }
@@ -103,12 +139,15 @@ export const columns = (getPreview, payInvoice): GridColDef[] => [
 
         let bgColor = "transparent";
 
-        if (params.row.status !== "paid") {
+        if (params.row.status !== "PAID") {
           if (daysUntilDue <= 0) {
             bgColor = "#ffebee";
           } else if (daysUntilDue <= 5) {
             bgColor = "#fff8e1";
           }
+        }
+        if (params.row.status == "PAID") {
+          bgColor = "#e9ffe1ff";
         }
 
         return (

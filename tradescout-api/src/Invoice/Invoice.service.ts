@@ -250,6 +250,8 @@ export class InvoiceService {
         })
       })
 
+      return {message: "success"}
+
     } catch(error){
       this.logger.error(`recordPayment: failed to save payment - ${error}`)
       throw new InternalServerErrorException("Failed to record payment")

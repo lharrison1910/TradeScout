@@ -22,10 +22,10 @@ export class Invoice {
   status: InvoiceStatusEnum;
 
   @Column({type: 'jsonb', nullable: true})
-  snapshotData: Record<string, any>;
+  snapshotData?: Record<string, any>;
 
   @Column({ type: 'timestamp', nullable: true })
-  issuedAt: Date;
+  issuedAt?: Date;
 
   @CreateDateColumn()
   createdAt: Date;

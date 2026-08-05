@@ -54,7 +54,6 @@ const InvoicePage = () => {
     return <SkeletonTable />;
   }
 
-  console.log(invoices);
 
   return (
     <Box
