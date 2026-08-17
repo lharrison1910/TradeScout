@@ -1,13 +1,13 @@
 package tradescout.api.tradescout.models;
 
 import jakarta.persistence.*;
-import lombok;
+import lombok.*;
 import java.time.Instant;
 import tradescout.api.tradescout.models.User;
 
 
 @Entity
-@Table(name='Business')
+@Table(name="Business")
 @Getter 
 @Setter
 @NoArgsConstructor
@@ -32,10 +32,10 @@ public class Business {
     private String accountName;
 
     @Column(nullable=true)
-    private String accountNumber
+    private String accountNumber;
 
     @Column(nullable=true)
-    private String sortCode
+    private String sortCode;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

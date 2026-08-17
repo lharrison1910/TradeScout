@@ -1,7 +1,7 @@
 package tradescout.api.tradescout.models;
 
 import jakarta.persistence.*;
-import lombok;
+import lombok.*;
 import java.time.Instant;
 import tradescout.api.tradescout.enums.InvoiceStatusEnum;
 import tradescout.api.tradescout.models.InvoiceData;
@@ -9,7 +9,7 @@ import tradescout.api.tradescout.models.Business;
 
 
 @Entity
-@Table(name='Invoice')
+@Table(name="Invoice")
 @Getter 
 @Setter
 @NoArgsConstructor
@@ -38,7 +38,7 @@ public class Invoice {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private InvoiceData invoiceSnapshot
+    private InvoiceData invoiceSnapshot;
 
     @Column
     private Instant issuedAt;

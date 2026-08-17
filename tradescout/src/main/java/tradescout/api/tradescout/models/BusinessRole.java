@@ -1,7 +1,7 @@
 package tradescout.api.tradescout.models;
 
 import jakarta.persistence.*;
-import lombok;
+import lombok.*;
 import java.time.Instant;
 import tradescout.api.tradescout.models.Business;
 import tradescout.api.tradescout.enums.BusinessRoleEnum;
@@ -9,7 +9,7 @@ import tradescout.api.tradescout.enums.BusinessRoleEnum;
 
 
 @Entity
-@Table(name='BusinessRole')
+@Table(name="BusinessRole")
 @Getter 
 @Setter
 @NoArgsConstructor
