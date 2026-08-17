@@ -19,14 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class DataSeeder implements CommandLineRunner {
+public class seed implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final BusinessRepository businessRepository;
     private final InvoiceRepository invoiceRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public DataSeeder(UserRepository userRepository,
+    public seed(UserRepository userRepository,
                       BusinessRepository businessRepository,
                       InvoiceRepository invoiceRepository,
                       PasswordEncoder passwordEncoder) {

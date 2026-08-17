@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tradescout.api.tradescout.dto.CreateInvoiceDraftRequest;
 import tradescout.api.tradescout.enums.InvoiceStatusEnum;
-import tradescout.api.tradescout.exception.ResourceNotFoundException;
 import tradescout.api.tradescout.exception.UnauthorizedAccessException;
 import tradescout.api.tradescout.models.Business;
 import tradescout.api.tradescout.models.Invoice;
@@ -29,7 +28,8 @@ public class InvoiceService {
 
     @Transactional
     public Invoice createDraft(CreateInvoiceDraftRequest payload, Long currentUserId) {
-        Business business = businessRepository.findByIdAndOwnerId(payload.getBusinessId(), currentUserId)
+        // Updated to findByIdAndUserId
+        Business business = businessRepository.findByIdAndUserId(payload.getBusinessId(), currentUserId)
                 .orElseThrow(() -> new UnauthorizedAccessException(
                         "Business not found or you do not have permission to access it"
                 ));

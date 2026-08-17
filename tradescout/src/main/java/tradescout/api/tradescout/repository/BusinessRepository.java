@@ -8,4 +8,5 @@ import tradescout.api.tradescout.models.Business;
 @Repository
 public interface BusinessRepository extends JpaRepository<Business, Long> {
     Optional<Business> findByIdAndOwnerId(Long id, Long ownerId);
+    Optional<Business> findByIdAndUserId(Long id, Long userId);
 }
