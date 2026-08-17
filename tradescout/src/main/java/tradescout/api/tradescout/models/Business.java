@@ -1,7 +1,9 @@
 package tradescout.api.tradescout.models;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.Instant;
 import tradescout.api.tradescout.models.User;
 
