@@ -28,7 +28,6 @@ public class InvoiceService {
 
     @Transactional
     public Invoice createDraft(CreateInvoiceDraftRequest payload, Long currentUserId) {
-        // Updated to findByIdAndUserId
         Business business = businessRepository.findByIdAndUserId(payload.getBusinessId(), currentUserId)
                 .orElseThrow(() -> new UnauthorizedAccessException(
                         "Business not found or you do not have permission to access it"
