@@ -34,6 +34,7 @@ public class AuthService {
         this.userRepository = userRepository;
         this.tokenProvider = tokenProvider;
         this.refreshTokenService = refreshTokenService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
