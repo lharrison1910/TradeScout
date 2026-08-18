@@ -7,6 +7,8 @@ import tradescout.api.tradescout.dto.AuthResponse;
 import tradescout.api.tradescout.dto.LoginRequest;
 import tradescout.api.tradescout.dto.RefreshTokenRequest;
 import tradescout.api.tradescout.service.AuthService;
+import org.springframework.http.HttpStatus;
+import tradescout.api.tradescout.dto.RegisterRequest;
 
 @RestController
 @RequestMapping("/api/auth")

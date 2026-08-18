@@ -74,7 +74,7 @@ public class seed implements CommandLineRunner {
             Business business = new Business();
             business.setBusinessName(businessNames[i]);
             business.setVatNumber("GB" + (100000000 + (i * 12345)));
-            business.setOwner(users.get(i % users.size()));
+            business.setUser(users.get(i % users.size()));
             businesses.add(businessRepository.save(business));
         }
 

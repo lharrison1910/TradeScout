@@ -1,6 +1,6 @@
 package tradescout.api.tradescout.enums;
 
-enum AuthProviderEnum {
+public enum AuthProviderEnum {
     LOCAL,
     GOOGLE,
 }

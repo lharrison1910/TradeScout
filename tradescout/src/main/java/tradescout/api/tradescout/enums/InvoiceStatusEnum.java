@@ -1,6 +1,6 @@
 package tradescout.api.tradescout.enums;
 
-enum InvoiceStatusEnum {
+public enum InvoiceStatusEnum {
     DRAFT,
     PAID,
     UNPAID,

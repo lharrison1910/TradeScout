@@ -3,6 +3,10 @@ package tradescout.api.tradescout.models;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.Instant;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import tradescout.api.tradescout.models.Business;
 import tradescout.api.tradescout.models.BusinessRole;
