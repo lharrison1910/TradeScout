@@ -1,48 +1,46 @@
 package tradescout.api.tradescout.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.time.Instant;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import java.util.ArrayList;
-import java.util.List;
 
-import tradescout.api.tradescout.models.User;
-
-
+import java.time.Instant;
 
 @Entity
-@Table(name="Business")
+@Table(name = "Business")
 @Getter 
 @Setter
 @NoArgsConstructor
-
-
+@AllArgsConstructor
 public class Business {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private String name;
+    @Column(name = "business_name", nullable = false)
+    private String businessName; 
 
-    @Column(nullable=true)
+    @Column(name = "vat_number", nullable = true)
+    private String vatNumber;
+
+    @Column(name = "tax_reference", nullable = true)
     private String taxReference;
 
-    @Column(nullable=true)
+    @Column(name = "bank_name", nullable = true)
     private String bankName;
 
-    @Column(nullable=true)
+    @Column(name = "account_name", nullable = true)
     private String accountName;
 
-    @Column(nullable=true)
+    @Column(name = "account_number", nullable = true)
     private String accountNumber;
 
-    @Column(nullable=true)
+    @Column(name = "sort_code", nullable = true)
     private String sortCode;
 
     @CreationTimestamp
@@ -54,6 +52,6 @@ public class Business {
     private Instant updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id", nullable=false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }
