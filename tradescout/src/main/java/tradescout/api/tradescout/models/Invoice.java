@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
-@Table(name = "Invoice")
+@Table(name = "invoices")
 @Getter 
 @Setter
 @NoArgsConstructor

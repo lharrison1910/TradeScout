@@ -29,7 +29,8 @@ public class AuthService {
     public AuthService(AuthenticationManager authenticationManager,
                        UserRepository userRepository,
                        JwtTokenProvider tokenProvider,
-                       RefreshTokenService refreshTokenService) {
+                       RefreshTokenService refreshTokenService,
+                PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.tokenProvider = tokenProvider;

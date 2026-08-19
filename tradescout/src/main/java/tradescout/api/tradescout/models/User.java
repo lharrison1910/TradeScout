@@ -13,7 +13,7 @@ import tradescout.api.tradescout.models.BusinessRole;
 import tradescout.api.tradescout.enums.AuthProviderEnum;
 
 @Entity
-@Table(name="User")
+@Table(name="users")
 @Getter 
 @Setter
 @NoArgsConstructor

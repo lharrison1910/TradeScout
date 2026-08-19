@@ -9,7 +9,7 @@ import tradescout.api.tradescout.enums.BusinessRoleEnum;
 
 
 @Entity
-@Table(name="BusinessRole")
+@Table(name="businessroles")
 @Getter 
 @Setter
 @NoArgsConstructor
