@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tradescout.api.tradescout.dto.CreateInvoiceDraftRequest;
+import tradescout.api.tradescout.dto.UpdateInvoiceDraftRequest;
 import tradescout.api.tradescout.enums.InvoiceStatusEnum;
 import tradescout.api.tradescout.exception.UnauthorizedAccessException;
 import tradescout.api.tradescout.models.Business;
@@ -30,8 +31,7 @@ public class InvoiceService {
     public Invoice createDraft(CreateInvoiceDraftRequest payload, Long currentUserId) {
         Business business = businessRepository.findByIdAndUserId(payload.getBusinessId(), currentUserId)
                 .orElseThrow(() -> new UnauthorizedAccessException(
-                        "Business not found or you do not have permission to access it"
-                ));
+                        "Business not found or you do not have permission to access it"));
 
         InvoiceData snapshotData = new InvoiceData();
         snapshotData.setCustomerName(payload.getCustomerName());
@@ -50,4 +50,12 @@ public class InvoiceService {
         logger.info("Draft invoice {} created for business ID {}", invoice.getInvoiceNumber(), business.getId());
         return invoiceRepository.save(invoice);
     }
+
+    @Transactional
+    public Invoice updateDraft(UpdateInvoiceDraftRequest payload, Long currentUserId) {
+        Invoice invoice = invoiceRepository.getById(payload.getInvoiceId())
+                .orElseThrow(() -> new UnauthorizedAccessException(
+                        "Invoice not found or you do not have permission to access it"));
+    }
+
 }
