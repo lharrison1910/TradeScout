@@ -17,7 +17,9 @@ import tradescout.api.tradescout.security.UserPrincipal;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +28,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import com.nimbusds.oauth2.sdk.Response;
 
 @RestController
 @RequestMapping("/api/invoice")
@@ -72,7 +76,6 @@ public class InvoiceController {
         return ResponseEntity.ok(invoice);
     }
 
-
     @GetMapping
     public ResponseEntity<Page<Invoice>> getInvoices(
             @RequestParam Long businessId,
@@ -90,6 +93,36 @@ public class InvoiceController {
                 businessId, status, pageable, currentUser.getId());
 
         return ResponseEntity.ok(invoices);
+    }
+
+    @PostMapping("/{id}/issue")
+    public ResponseEntity<byte[]> issueInvoice(@AuthenticationPrincipal UserPrincipal currentUser, @PathVariable Long id) {
+        byte[] invoiceBuffer = invoiceService.issueInvoice(id, currentUser.getId());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=invoice_" + id + ".docx")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(invoiceBuffer);
+    }
+
+    @GetMapping("/{id}/download")
+    public ResponseEntity<byte[]> downloadInvoiceDocx(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal currentUser
+    ) {
+        byte[] invoiceToDownload = invoiceService.downloadInvoice(id, currentUser.getId());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=invoice_" + id + ".docx")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(invoiceToDownload);
+    }
+
+    @PostMapping("/{id}/paid")
+    public String recordPayments(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            @PathVariable Long id) {
+        //TODO: process POST request
+
+        return "";
     }
 
 }

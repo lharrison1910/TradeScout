@@ -1,11 +1,19 @@
 package tradescout.api.tradescout.service;
 
+import java.io.InputStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import com.deepoove.poi.XWPFTemplate;
 
 import tradescout.api.tradescout.dto.CreateInvoiceDraftRequest;
 import tradescout.api.tradescout.dto.UpdateInvoiceDraftRequest;
@@ -70,7 +78,6 @@ public class InvoiceService {
         Invoice invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with ID: " + invoiceId));
 
-        // 1. Ownership Security Check
         if (!invoice.getBusiness().getUser().getId().equals(currentUserId)) {
             throw new UnauthorizedAccessException("You do not have permission to modify this invoice");
         }
@@ -150,6 +157,70 @@ public class InvoiceService {
 
         return invoiceRepository.findByBusinessIdAndBusinessUserIdAndIsDeletedFalse(
                 businessId, currentUserId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] downloadInvoice(Long invoiceId, Long currentUserId) {
+        Invoice invoice = invoiceRepository.findByIdAndBusinessUserIdAndIsDeletedFalse(invoiceId, currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found or access denied for ID: " + invoiceId));
+
+        InvoiceData invoiceData = invoice.getInvoiceSnapshot();
+        if (invoiceData == null) {
+            throw new IllegalStateException("Invoice snapshot data is missing for invoice ID: " + invoiceId);
+        }
+
+        return getInvoiceBuffer(invoiceData);
+    }
+
+    @Transactional
+    public byte[] issueInvoice(Long invoiceId, Long currentUserId) {
+        // 1. Fetch invoice and verify tenant ownership
+        Invoice invoice = invoiceRepository.findByIdAndBusinessUserIdAndIsDeletedFalse(invoiceId, currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("No invoice found with ID: " + invoiceId));
+
+        // 2. Status guard clause (Only DRAFT can be issued)
+        if (invoice.getStatus() != InvoiceStatusEnum.DRAFT) {
+            throw new IllegalStateException("Invoice is not a draft and cannot be issued");
+        }
+
+        byte[] buffer;
+        try {
+            buffer = getInvoiceBuffer(invoice.getInvoiceSnapshot());
+
+            // Save to AWS S3
+        } catch (ResourceNotFoundException e) {
+            logger.error("_getInvoiceBuffer: Template not found - {}", e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            logger.error("issueInvoice: Failed to generate docx file - {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to generate invoice preview", e);
+        }
+
+        invoice.setStatus(InvoiceStatusEnum.UNPAID);
+        invoiceRepository.save(invoice);
+
+        logger.info("Successfully issued invoice {} (ID: {})", invoice.getInvoiceNumber(), invoiceId);
+        return buffer;
+    }
+
+    public byte[] getInvoiceBuffer(InvoiceData invoiceData) {
+        ClassPathResource resource = new ClassPathResource("templates/template.docx");
+
+        if (!resource.exists()) {
+            throw new ResourceNotFoundException("Invoice template not found at templates/template.docx");
+        }
+
+        try (InputStream inputStream = resource.getInputStream(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            XWPFTemplate template = XWPFTemplate.compile(inputStream).render(invoiceData);
+
+            template.write(outputStream);
+            template.close();
+
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to generate docx invoice buffer", e);
+        }
     }
 
 }
