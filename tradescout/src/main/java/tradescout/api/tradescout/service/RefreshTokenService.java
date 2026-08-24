@@ -32,13 +32,20 @@ public class RefreshTokenService {
      */
     @Transactional
     public RefreshToken createRefreshToken(User user) {
-        refreshTokenRepository.deleteByUser(user);
+        // 1. Fetch existing token for user or create new instance
+        RefreshToken refreshToken = refreshTokenRepository.findByUser(user)
+                .orElseGet(() -> {
+                    RefreshToken newToken = new RefreshToken();
+                    newToken.setUser(user);
+                    return newToken;
+                });
 
-        RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setUser(user);
+        // 2. Overwrite token string and reset expiration
+        refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
-        refreshToken.setToken(UUID.randomUUID().toString()); // Generates a unique, secure string
+        refreshToken.setRevoked(false);
 
+        // 3. Save (Updates if existing ID present, Inserts if new)
         return refreshTokenRepository.save(refreshToken);
     }
 
