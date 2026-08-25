@@ -14,10 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateInvoiceDraftRequest {
-
-    @NotNull(message = "Business ID is required")
-    private Long businessId;
+public class UpdateInvoiceDraftRequest {
 
     @NotBlank(message = "Invoice number is required")
     private String invoiceNumber;
@@ -28,8 +25,9 @@ public class CreateInvoiceDraftRequest {
     private LocalDate dueDate;
 
     @Min(value = 0, message = "Payment terms days cannot be negative")
-    private Integer paymentTermsDays = 30;
+    private Integer paymentTermsDays;
 
+    // Customer Information
     @NotBlank(message = "Customer name is required")
     private String customerName;
 
@@ -56,10 +54,10 @@ public class CreateInvoiceDraftRequest {
     private List<LineItemRequest> lineItems = new ArrayList<>();
 
     @DecimalMin(value = "0.00", message = "VAT rate cannot be negative")
-    private BigDecimal vatRate = new BigDecimal("20.00");
+    private BigDecimal vatRate;
 
     @DecimalMin(value = "0.00", message = "Discount cannot be negative")
-    private BigDecimal discountAmount = BigDecimal.ZERO;
+    private BigDecimal discountAmount;
 
     private String notes;
 }
