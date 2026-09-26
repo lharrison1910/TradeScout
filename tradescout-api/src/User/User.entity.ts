@@ -1,6 +1,7 @@
-import { Business } from 'src/Business/Business.entity';
-import { Expense } from 'src/Expense/Expense.entity';
-import { Income } from 'src/Income/Income.entity';
+import { Business } from '../Business/Business.entity';
+// import { Expense } from 'src/Expense/Expense.entity';
+// import { Income } from 'src/Income/Income.entity';
+import { RefreshToken } from 'src/RefreshToken/refreshToken.entity';
 import {
   Column,
   CreateDateColumn,
@@ -24,6 +25,9 @@ export class User {
   @Column({ type: 'varchar', unique: true })
   email: string;
 
+    @Column({ type: 'varchar' })
+  name: string;
+
   @Column({ type: 'varchar', nullable: true })
   password: string;
 
@@ -37,9 +41,6 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   providerId: string | null;
 
-  @Column({ type: 'varchar' })
-  name: string;
-
   @Column({ type: 'boolean', default: false })
   termsAccepted: boolean;
 
@@ -49,12 +50,15 @@ export class User {
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
-  @OneToMany(() => Expense, (expense) => expense.user)
-  expenses: Expense[];
+  // @OneToMany(() => Expense, (expense) => expense.user)
+  // expenses: Expense[];
 
-  @OneToMany(() => Income, (income) => income.user)
-  incomes: Income[];
+  // @OneToMany(() => Income, (income) => income.user)
+  // incomes: Income[];
 
   @OneToMany(() => Business, (business) => business.user)
   businesses: Business[];
+
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
+  refreshTokens: RefreshToken[];
 }

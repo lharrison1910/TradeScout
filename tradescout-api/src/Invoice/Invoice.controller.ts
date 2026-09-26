@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, Inject, Param, Post, Put, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Inject,
+  Param,
+  Post,
+  Put,
+  Query,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { InvoiceService } from './Invoice.service';
 import type { NewInvoiceRequestSchema } from '../types/invoiceSchema';
 import type { Response } from 'express';
@@ -14,84 +26,99 @@ export class InvoiceController {
     private readonly invoiceService: InvoiceService,
   ) {}
 
-  @Post("/draft")
-  async createDraft(@CurrentUser() currentUser:CurrentUserType,@Body() body: NewInvoiceRequestSchema){
-    return await this.invoiceService.createDraft(body, currentUser)
+  @Post('/draft')
+  async createDraft(
+    @CurrentUser() currentUser: CurrentUserType,
+    @Body() body: NewInvoiceRequestSchema,
+  ) {
+    return await this.invoiceService.createDraft(body, currentUser);
   }
 
-  @Put(":id/draft")
-  async updateDraft(@Param('id') id: number, @Body() body, @CurrentUser() currentUser:CurrentUserType){
-    return await this.invoiceService.updateDraft(body, id, currentUser)
+  @Put(':id/draft')
+  async updateDraft(
+    @Param('id') id: number,
+    @Body() body,
+    @CurrentUser() currentUser: CurrentUserType,
+  ) {
+    return await this.invoiceService.updateDraft(id, body, currentUser);
   }
 
   @Get(':id/preview')
-  async getPreview(@Param('id') id: number,@Res() res: Response){
-    const fileBuffer =  await this.invoiceService.previewInvoice(id)
-
+  async getPreview(
+    @Param('id') id: number,
+    @Res() res: Response,
+    @CurrentUser() currentUser: CurrentUserType,
+  ) {
+    const fileBuffer = await this.invoiceService.previewInvoice(
+      id,
+      currentUser,
+    );
     res.set({
       'Content-Type':
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'Content-Disposition': `attachment; filename=Invoice_${id}.docx`,
       'Content-Length': fileBuffer.length,
     });
-
     res.send(fileBuffer);
   }
 
-  @Delete(":id")
-  async deleteDraft(@Param('id') id: number){
-    return await this.invoiceService.deleteDraft(id)
+  @Delete(':id')
+  async deleteDraft(
+    @Param('id') id: number,
+    @CurrentUser() currentUser: CurrentUserType,
+  ) {
+    return await this.invoiceService.deleteDraft(id, currentUser);
   }
 
   @Post(':id/issue')
-  async issueInvoice(@Param('id') id: number,@Res() res: Response){
-    const fileBuffer = await this.invoiceService.issueInvoice(id)
-
-    res.set({
-      'Content-Type':
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'Content-Disposition': `attachment; filename=Invoice_${id}.docx`,
-      'Content-Length': fileBuffer.length,
-    });
-
-    res.send(fileBuffer);
-  }
-
-  @Get(":id/download")
-  async downloadInvoice(@Param('id') id: number,@Res() res: Response){
-        const fileBuffer = await this.invoiceService.downloadInvoice(id)
-
+  async issueInvoice(@Param('id') id: number, @Res() res: Response) {
+    // const fileBuffer = await this.invoiceService.issueInvoice(id)
     // res.set({
     //   'Content-Type':
     //   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     //   'Content-Disposition': `attachment; filename=Invoice_${id}.docx`,
     //   'Content-Length': fileBuffer.length,
     // });
+    // res.send(fileBuffer);
+  }
 
-    res.send(fileBuffer);
+  @Get(':id/download')
+  async downloadInvoice(@Param('id') id: number, @Res() res: Response) {
+    // const fileBuffer = await this.invoiceService.downloadInvoice(id)
+    // res.set({
+    //   'Content-Type':
+    //   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    //   'Content-Disposition': `attachment; filename=Invoice_${id}.docx`,
+    //   'Content-Length': fileBuffer.length,
+    // });
+    // res.send(fileBuffer);
   }
 
   @Get(':id')
-  async getJobDetails(@Param('id') id: number){
-    return await this.invoiceService.getJobDetails(id)
+  async getJobDetails(@Param('id') id: number) {
+    // return await this.invoiceService.getJobDetails(id)
   }
 
   @Post(':id/pay')
-  async recordPayment(@Param('id') id: number, @CurrentUser() currentUser:CurrentUserType){
-    return await this.invoiceService.recordPayment(id, currentUser)
+  async recordPayment(
+    @Param('id') id: number,
+    @CurrentUser() currentUser: CurrentUserType,
+  ) {
+    // return await this.invoiceService.recordPayment(id, currentUser)
   }
 
   @Post(':id/void')
-  async voidInvoice(@Param('id') id: number){
-    return await this.invoiceService.voidInvoice(id)
+  async voidInvoice(@Param('id') id: number) {
+    // return await this.invoiceService.voidInvoice(id)
   }
 
   @Get()
-  async findAllByQuery(){
-    return await this.invoiceService.listInvoiceByFilter({})
+  async findAllByQuery(
+    @Query() query: any,
+    @CurrentUser() currentUser: CurrentUserType,
+  ) {
+    return await this.invoiceService.listInvoiceByFilter(query, currentUser);
   }
-
-
 
   // @Post()
   // async newInvoice(@Body() body: NewInvoiceRequestSchema, @Res() res: Response) {

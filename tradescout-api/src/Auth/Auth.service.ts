@@ -2,6 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   ConflictException,
+  Res,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -50,6 +51,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
+    console.log(pass, user.password, 'password compare');
     const isPasswordValid = await bcrypt.compare(pass, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid email or password');
@@ -61,7 +63,7 @@ export class AuthService {
     };
     const tokens = await this.generateJwt(payload);
 
-    const response = {
+    return {
       user: {
         email: user.email,
         name: user.name,
@@ -70,8 +72,6 @@ export class AuthService {
       },
       tokens,
     };
-
-    return response;
   }
 
   async register(email: string, pass: string, name: string): Promise<User> {

@@ -9,20 +9,27 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
-import { Route as AuthenticatedIncomeRouteImport } from './routes/_authenticated/income'
 import { Route as AuthenticatedExpenseRouteImport } from './routes/_authenticated/expense'
+import { Route as AuthenticatedIncomeRouteImport } from './routes/_authenticated/income'
+import { Route as AuthenticatedInvoiceRouteImport } from './routes/_authenticated/invoice'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
@@ -30,9 +37,9 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+const AuthenticatedExpenseRoute = AuthenticatedExpenseRouteImport.update({
+  id: '/expense',
+  path: '/expense',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedIncomeRoute = AuthenticatedIncomeRouteImport.update({
@@ -40,23 +47,32 @@ const AuthenticatedIncomeRoute = AuthenticatedIncomeRouteImport.update({
   path: '/income',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedExpenseRoute = AuthenticatedExpenseRouteImport.update({
-  id: '/expense',
-  path: '/expense',
+const AuthenticatedInvoiceRoute = AuthenticatedInvoiceRouteImport.update({
+  id: '/invoice',
+  path: '/invoice',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/expense': typeof AuthenticatedExpenseRoute
   '/income': typeof AuthenticatedIncomeRoute
+  '/invoice': typeof AuthenticatedInvoiceRoute
   '/settings': typeof AuthenticatedSettingsRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/expense': typeof AuthenticatedExpenseRoute
   '/income': typeof AuthenticatedIncomeRoute
+  '/invoice': typeof AuthenticatedInvoiceRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/': typeof AuthenticatedIndexRoute
 }
@@ -64,22 +80,40 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/_authenticated/expense': typeof AuthenticatedExpenseRoute
   '/_authenticated/income': typeof AuthenticatedIncomeRoute
+  '/_authenticated/invoice': typeof AuthenticatedInvoiceRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/expense' | '/income' | '/settings'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/expense'
+    | '/income'
+    | '/invoice'
+    | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/expense' | '/income' | '/settings' | '/'
+  to:
+    | '/login'
+    | '/register'
+    | '/expense'
+    | '/income'
+    | '/invoice'
+    | '/settings'
+    | '/'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
+    | '/register'
     | '/_authenticated/expense'
     | '/_authenticated/income'
+    | '/_authenticated/invoice'
     | '/_authenticated/settings'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
@@ -87,10 +121,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -98,11 +140,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/': {
@@ -112,11 +154,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/settings': {
-      id: '/_authenticated/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+    '/_authenticated/expense': {
+      id: '/_authenticated/expense'
+      path: '/expense'
+      fullPath: '/expense'
+      preLoaderRoute: typeof AuthenticatedExpenseRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/income': {
@@ -126,11 +168,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIncomeRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/expense': {
-      id: '/_authenticated/expense'
-      path: '/expense'
-      fullPath: '/expense'
-      preLoaderRoute: typeof AuthenticatedExpenseRouteImport
+    '/_authenticated/invoice': {
+      id: '/_authenticated/invoice'
+      path: '/invoice'
+      fullPath: '/invoice'
+      preLoaderRoute: typeof AuthenticatedInvoiceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
   }
@@ -139,6 +188,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedExpenseRoute: typeof AuthenticatedExpenseRoute
   AuthenticatedIncomeRoute: typeof AuthenticatedIncomeRoute
+  AuthenticatedInvoiceRoute: typeof AuthenticatedInvoiceRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
@@ -146,6 +196,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedExpenseRoute: AuthenticatedExpenseRoute,
   AuthenticatedIncomeRoute: AuthenticatedIncomeRoute,
+  AuthenticatedInvoiceRoute: AuthenticatedInvoiceRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
@@ -157,6 +208,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

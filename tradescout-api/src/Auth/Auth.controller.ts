@@ -14,6 +14,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '../User/User.service';
 import { CurrentUserType } from '../types/currentUser';
+import { JwtRefreshAuthGuard } from './auth.jwt-refresh.guard';
 
 interface LoginDto {
   email: string;
@@ -51,21 +52,19 @@ export class AuthController {
     return { accessToken, user };
   }
 
+  @UseGuards(JwtRefreshAuthGuard)
   @Post('refresh')
   async refresh(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const oldRefreshToken = request.cookies['refreshToken'];
-    if (!oldRefreshToken) {
-      throw new UnauthorizedException('Refresh token is missing');
-    }
-
-    const decoded = await this.authService.verifyRefreshToken(oldRefreshToken);
-    const mockUser = { sub: decoded.sub, email: decoded.email };
+    const user = request.user as { userId: string; email: string };
 
     const { accessToken, refreshToken: newRefreshToken } =
-      await this.authService.generateJwt(mockUser);
+      await this.authService.generateJwt({
+        sub: user.userId,
+        email: user.email,
+      });
 
     response.cookie('refreshToken', newRefreshToken, {
       httpOnly: true,
@@ -112,5 +111,10 @@ export class AuthController {
   @Get('me')
   async getProfile(@Req() req) {
     return this.userService.getUser(req.user as CurrentUserType);
+  }
+
+  @Post('/register')
+  async registerUser(@Body() body) {
+    return await this.userService.registerUser(body);
   }
 }

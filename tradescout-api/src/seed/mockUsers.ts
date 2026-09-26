@@ -5,7 +5,7 @@ export const generateMockUsers = async () => {
 
   return [
     {
-      email: 'admin',
+      email: 'admin@admin.com',
       password: defaultPasswordHash,
       name: 'admin',
       termsAccepted: true,

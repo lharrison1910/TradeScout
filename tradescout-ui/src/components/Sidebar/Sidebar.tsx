@@ -15,8 +15,8 @@ const Sidebar = ({ open, handleClose }) => {
   const buttons = [
     { title: "Home", endIcon: <Home />, nav: "/" },
     { title: "Invoice", endIcon: <Receipt />, nav: "/invoice" },
-    { title: "Income", endIcon: <TrendingUp />, nav: "/Income" },
-    { title: "Expense", endIcon: <TrendingDown />, nav: "/Expense" },
+    // { title: "Income", endIcon: <TrendingUp />, nav: "/Income" },
+    // { title: "Expense", endIcon: <TrendingDown />, nav: "/Expense" },
     { title: "Settings", endIcon: <Settings />, nav: "/settings" },
   ];
 

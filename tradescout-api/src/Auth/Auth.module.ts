@@ -9,6 +9,7 @@ import { User } from 'src/User/User.entity';
 import { AuthController } from './Auth.controller';
 import { GoogleStrategy } from 'src/strategies/google.strategy';
 import { UserModule } from 'src/User/User.module';
+import { JwtRefreshStrategy } from 'src/strategies/jwt-refresh.strategy';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { UserModule } from 'src/User/User.module';
     UserModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, GoogleStrategy],
+  providers: [AuthService, JwtStrategy, GoogleStrategy, JwtRefreshStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

@@ -6,11 +6,21 @@ interface InvoicePreviewModalProps {
   onClose: () => void;
 }
 
-const InvoicePreviewModal = ({ blob, onClose }: InvoicePreviewModalProps) => {
+interface InvoicePreviewModalProps {
+  open: boolean;
+  blob: Blob | null | undefined;
+  onClose: () => void;
+}
+
+const InvoicePreviewModal = ({
+  open,
+  blob,
+  onClose,
+}: InvoicePreviewModalProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (blob && containerRef.current) {
+    if (open && blob && containerRef.current) {
       containerRef.current.innerHTML = "";
 
       renderAsync(blob, containerRef.current, undefined, {
@@ -20,16 +30,19 @@ const InvoicePreviewModal = ({ blob, onClose }: InvoicePreviewModalProps) => {
         ignoreHeight: false,
       }).catch((err) => console.error("Error rendering docx:", err));
     }
-  }, [blob]);
+  }, [open, blob]);
 
-  if (!blob) return null;
+  // Hide modal if open is false or blob isn't loaded yet
+  if (!open || !blob) return null;
 
   return (
-    <div style={modalOverlayStyle}>
-      <div style={modalContentStyle}>
+    <div style={modalOverlayStyle} onClick={onClose}>
+      <div style={modalContentStyle} onClick={(e) => e.stopPropagation()}>
         <div style={headerStyle}>
           <h3>Invoice Preview (.docx)</h3>
-          <button onClick={onClose}>Close</button>
+          <button type="button" onClick={onClose}>
+            Close
+          </button>
         </div>
 
         <div

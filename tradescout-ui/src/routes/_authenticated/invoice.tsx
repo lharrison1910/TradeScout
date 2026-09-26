@@ -1,0 +1,16 @@
+import { createFileRoute, useRouter } from '@tanstack/react-router'
+import Invoice from '../../pages/Invoices/Invoice';
+
+export const Route = createFileRoute('/_authenticated/invoice')({
+component: () => {
+    const router = useRouter();
+    const { auth } = router.options.context;
+
+    if (auth.user) {
+      return <Invoice/>;
+    }
+  },
+})
+
+
+

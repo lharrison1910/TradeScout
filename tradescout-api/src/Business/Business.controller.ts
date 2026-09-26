@@ -13,9 +13,11 @@ export class BusinessController {
     @CurrentUser('userId') currentUser: number,
     @Param('id') businessId: string,
   ) {
-    return await this.businessService.getRecentBusinessTransactions(
-      currentUser,
-      businessId,
-    );
+    // return await this.businessService.getRecentBusinessTransactions(
+    //   currentUser,
+    //   businessId,
+    // );
+
+    return {};
   }
 }

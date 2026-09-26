@@ -1,134 +1,74 @@
-let inMemoryToken: string | null = null;
-let isRefreshing = false;
-let activeRefreshPromise: Promise<{ accessToken: string }> | null = null;
-
-interface QueuedRequest {
-  resolve: (token: string) => void;
-  reject: (err: any) => void;
-}
-let refreshSubscribers: QueuedRequest[] = [];
-
-export const setAccessToken = (token: string | null) => {
-  inMemoryToken = token;
-};
-
-const subscribeTokenRefresh = (
-  resolve: (token: string) => void,
-  reject: (err: any) => void,
-) => {
-  refreshSubscribers.push({ resolve, reject });
-};
-
-const onTokenRefreshed = (token: string) => {
-  refreshSubscribers.forEach((sub) => sub.resolve(token));
-  refreshSubscribers = [];
-};
-
-const onRefreshFailed = (error: any) => {
-  refreshSubscribers.forEach((sub) => sub.reject(error));
-  refreshSubscribers = [];
-};
-
-export const executeSilentRefresh = async (
-  baseUrl: string,
-): Promise<string> => {
-  if (activeRefreshPromise) {
-    const result = await activeRefreshPromise;
-    return result.accessToken;
-  }
-
-  activeRefreshPromise = fetch(`${baseUrl}/auth/refresh`, {
-    method: "POST",
-    credentials: "include",
-  }).then(async (res) => {
-    if (!res.ok) throw new Error("Refresh failed");
-    return res.json();
-  });
-
-  try {
-    const data = await activeRefreshPromise;
-    inMemoryToken = data.accessToken;
-    setAccessToken(data.accessToken);
-    return data.accessToken;
-  } finally {
-    activeRefreshPromise = null;
-  }
-};
-
 export class BaseApi {
   constructor(readonly url = "http://localhost:3000/api") {}
+
+  private async refreshAccessToken(): Promise<string> {
+    try {
+      const refreshRes = await fetch(`${this.url}/auth/refresh`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!refreshRes.ok) throw new Error("Refresh expired");
+
+      const data = await refreshRes.json();
+      sessionStorage.setItem("accessToken", data.accessToken);
+
+      return data.accessToken;
+    } catch (err) {
+      sessionStorage.removeItem("accessToken");
+      window.location.href = "/login";
+      throw err;
+    }
+  }
+
+  private isPublicRoute(path: string): boolean {
+    const publicKeywords = ["login", "register", "refresh"];
+    return publicKeywords.some((keyword) =>
+      path.toLowerCase().includes(keyword),
+    );
+  }
 
   private async request(
     path: string,
     options: RequestInit = {},
   ): Promise<Response> {
-    const url = `${this.url}/${path}`;
+    let accessToken = sessionStorage.getItem("accessToken");
+    const fullUrl = `${this.url}/${path}`;
+
     options.credentials = "include";
+
+    const isPublic = this.isPublicRoute(path);
+
+    if (!accessToken && !isPublic) {
+      accessToken = await this.refreshAccessToken();
+    }
 
     const headers = {
       ...options.headers,
     } as Record<string, string>;
 
-    if (inMemoryToken) {
-      headers["Authorization"] = `Bearer ${inMemoryToken}`;
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
     }
     options.headers = headers;
 
-    const res = await fetch(url, options);
+    let res = await fetch(fullUrl, options);
 
-    if (res.status === 401) {
-      if (path.includes("/refresh")) {
-        throw new Error("Session expired");
-      }
+    // Retry once with a refreshed token if a protected route returns 401
+    if (res.status === 401 && !isPublic) {
+      accessToken = await this.refreshAccessToken();
 
-      if (!isRefreshing) {
-        isRefreshing = true;
+      headers["Authorization"] = `Bearer ${accessToken}`;
+      options.headers = headers;
 
-        try {
-          const refreshRes = await fetch(`${this.url}/auth/refresh`, {
-            method: "POST",
-            credentials: "include",
-          });
-
-          if (!refreshRes.ok) throw new Error("Refresh expired");
-
-          const data = await refreshRes.json();
-          inMemoryToken = data.accessToken;
-          isRefreshing = false;
-
-          onTokenRefreshed(data.accessToken);
-        } catch (err) {
-          isRefreshing = false;
-          inMemoryToken = null;
-
-          onRefreshFailed(err);
-
-          window.location.href = "/login";
-          throw err;
-        }
-      }
-
-      return new Promise((resolve, reject) => {
-        subscribeTokenRefresh(
-          async (newToken) => {
-            try {
-              headers["Authorization"] = `Bearer ${newToken}`;
-              const retryRes = await fetch(url, { ...options, headers });
-              if (!retryRes.ok) throw new Error(retryRes.statusText);
-              resolve(await retryRes.json());
-            } catch (retryErr) {
-              reject(retryErr);
-            }
-          },
-          (error) => {
-            reject(error);
-          },
-        );
-      });
+      res = await fetch(fullUrl, options);
     }
 
     if (!res.ok) {
-      throw new Error(res.statusText);
+      // Extract the actual error message from the NestJS response body
+      const errorData = await res.json().catch(() => null);
+      const message = errorData?.message || res.statusText || "Request failed";
+      throw new Error(Array.isArray(message) ? message.join(", ") : message);
     }
 
     return res;
@@ -168,18 +108,17 @@ export class BaseApi {
   }
 
   async delete(url: string) {
-    const res = await this.request(url);
+    const res = await this.request(url, { method: "DELETE" });
     return await res.json();
   }
 
-  async blob(url: string, body: string) {
+  async blob(url: string) {
     const headers: Record<string, string> = {};
-    if (typeof body === "string") {
-      headers["Content-Type"] = "application/json";
-    }
+    // if (typeof body === "string") {
+    //   headers["Content-Type"] = "application/json";
+    // }
     const res = await this.request(url, {
-      method: "POST",
-      body,
+      method: "GET",
       headers,
     });
 

@@ -19,6 +19,10 @@ const Grid = ({ columns, rows }: GridProps) => {
         },
       }}
       pageSizeOptions={[5]}
+      sx={{
+        width: "fit-content",
+        maxWidth: "90%",
+      }}
     />
   );
 };

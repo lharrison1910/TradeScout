@@ -1,23 +1,32 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { User } from './User.entity';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { passwordCheck } from 'src/utils/passwordCheck';
 import * as bcrypt from 'bcrypt';
 import { CurrentUserType } from 'src/types/currentUser';
+import { BusinessService } from 'src/Business/Business.service';
+import { DataSource } from 'typeorm/browser';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
+    @Inject()
+    private readonly businessService: BusinessService,
+
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
 
     @InjectPinoLogger(UserService.name)
     private readonly logger: PinoLogger,
@@ -101,6 +110,36 @@ export class UserService {
         `updateAccountDetails: Failed to update account(${currentUser.userId}) - ${error}`,
       );
       throw new InternalServerErrorException('Failed to update detail');
+    }
+  }
+
+  async registerUser(payload) {
+    const { business, ...userDetials } = payload;
+
+    try {
+      return await this.dataSource.transaction(async (em) => {
+        const hashedPassword = await bcrypt.hash(userDetials.password, 10);
+        const user = em.getRepository(User).create({
+          ...userDetials,
+          password: hashedPassword,
+        } as Partial<User>);
+        const savedUser = await em.getRepository(User).save(user);
+
+        await this.businessService.createBusiness(
+          { ...business, user: savedUser },
+          em,
+        );
+
+        return await em.getRepository(User).findOne({
+          where: { id: savedUser.id },
+          relations: {
+            businesses: true,
+          },
+        });
+      });
+    } catch (error) {
+      this.logger.error(`registerUser - failed to create user: ${error}`);
+      throw new InternalServerErrorException('Failed to create accoutn');
     }
   }
 }

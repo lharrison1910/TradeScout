@@ -1,28 +1,37 @@
-import { Box, Paper, Typography, LinearProgress, Divider } from "@mui/material";
-import { SnapRecieptCard } from "../../components/SnapRecieptCard/SnapRecieptCard";
-import ExpenseModal from "../../components/ExpenseModal/ExpenseModal";
-import IncomeModal from "../../components/IncomeModal/IncomeModal";
 import { useState } from "react";
+import {
+  Box,
+  Paper,
+  Typography,
+  LinearProgress,
+  Divider,
+  Container,
+  Grid,
+  Stack,
+} from "@mui/material";
+import { Add, TrendingUp, TrendingDown } from "@mui/icons-material";
+
 import { useAuth } from "../../hooks/useAuth/useAuth";
 import Button from "../../components/Button/Button";
-import { useNewInvoice } from "../../hooks/Invoice/useNewInvoice";
-import RecentTable from "./RecentTable";
+// import RecentTable from "./RecentTable";
+
+import ExpenseModal from "../../components/ExpenseModal/ExpenseModal";
+import IncomeModal from "../../components/IncomeModal/IncomeModal";
 import InvoiceModal from "../../components/InvoiceModal/InvoiceModal";
-import InvoicePreviewModal from "../../components/InvoicePreviewModal/InvoicePreviewModal";
+// import InvoicePreviewModal from "../../components/InvoicePreviewModal/InvoicePreviewModal";
 
 const Home = () => {
   const [expenseModal, setExpenseModal] = useState<boolean>(false);
   const [incomeModal, setIncomeModal] = useState<boolean>(false);
   const [invoiceModal, setInvoiceModal] = useState<boolean>(false);
-  const [invoiceBlob, setInvoiceBlob] = useState<Blob | null>(null);
+  // const [invoiceBlob, setInvoiceBlob] = useState<Blob | null>(null);
 
   const { user } = useAuth();
-  const { mutateAsync: newInvoice } = useNewInvoice();
 
-  const getFiscalQuarter = (
-    startMonth: number,
+  const getFiscalQuarterInfo = (
+    fiscalStartMonth: number = 4,
     date: Date = new Date(),
-  ): string => {
+  ) => {
     const monthNames = [
       "Jan",
       "Feb",
@@ -39,101 +48,232 @@ const Home = () => {
     ];
 
     const currentMonth = date.getMonth();
+    const startMonthIndex = fiscalStartMonth - 1;
 
-    const startMonthIndex = startMonth - 1;
-
+    // 1. Calculate Quarter Label & Month Range
     const elapsedMonths = (currentMonth - startMonthIndex + 12) % 12;
+    const quarterIndex = Math.floor(elapsedMonths / 3);
+    const quarterLabel = `Q${quarterIndex + 1}`;
 
-    const quarterStartElapsed = elapsedMonths - (elapsedMonths % 3);
-
-    const qStartMonthIndex = (startMonthIndex + quarterStartElapsed) % 12;
+    const qStartMonthIndex = (startMonthIndex + quarterIndex * 3) % 12;
     const qEndMonthIndex = (qStartMonthIndex + 2) % 12;
+    const range = `${monthNames[qStartMonthIndex]}-${monthNames[qEndMonthIndex]}`;
 
-    return `${monthNames[qStartMonthIndex]}-${monthNames[qEndMonthIndex]}`;
+    let endYear = date.getFullYear();
+    if (qEndMonthIndex < currentMonth) {
+      endYear += 1;
+    }
+
+    let startYear = date.getFullYear();
+    if (qStartMonthIndex > currentMonth) {
+      startYear -= 1;
+    }
+
+    const quarterStart = new Date(startYear, qStartMonthIndex, 1);
+    const quarterEnd = new Date(endYear, qEndMonthIndex + 1, 0, 23, 59, 59);
+
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const todayMs = date.getTime();
+
+    const daysRemaining = Math.max(
+      0,
+      Math.ceil((quarterEnd.getTime() - todayMs) / msPerDay),
+    );
+
+    const totalQuarterDays = Math.ceil(
+      (quarterEnd.getTime() - quarterStart.getTime()) / msPerDay,
+    );
+    const daysElapsed = totalQuarterDays - daysRemaining;
+    const progressPercent = Math.min(
+      100,
+      Math.max(0, Math.round((daysElapsed / totalQuarterDays) * 100)),
+    );
+
+    return { quarterLabel, range, daysRemaining, progressPercent };
   };
 
-  const currentQuater = getFiscalQuarter(new Date().getMonth() + 1);
+  const { quarterLabel, range, daysRemaining, progressPercent } =
+    getFiscalQuarterInfo(4);
 
   return (
-    <>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 4,
-          alignItems: "center",
-        }}
-      >
-        <Paper
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Stack spacing={4}>
+        {/* ==========================================
+            1. WELCOME & QUICK ACTIONS HEADER
+        ========================================== */}
+        <Box
           sx={{
             display: "flex",
-            flexDirection: "column",
-            minHeight: "15%",
-            width: "50%",
-            justifyContent: "space-around",
-            padding: 2,
+            justifyContent: "space-between",
             alignItems: "center",
+            flexWrap: "wrap",
+            gap: 2,
           }}
         >
-          <Typography variant="h2">Hello {user.name}!</Typography>
-
-          <Box
-            sx={{
-              width: "fit-content",
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-            }}
-          >
-            <Typography sx={{ fontWeight: 500 }}>
-              Current MTD Quarter: Q2 ({currentQuater})
+          <Box>
+            <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+              Welcome back, {user?.name || "User"}
             </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Here is what's happening with your business today.
+            </Typography>
+          </Box>
 
-            <LinearProgress
-              variant="determinate"
-              value={30}
-              sx={{
-                width: "100%",
-                borderRadius: 2,
-                height: 6,
-              }}
+          {/* Action Button Group */}
+          <Stack direction="row" spacing={1.5}>
+            <Button
+              title="Log Income"
+              onClick={() => setIncomeModal(true)}
+              startIcon={<TrendingUp />}
+              // variant="outlined"
             />
+            <Button
+              title="Log Expense"
+              onClick={() => setExpenseModal(true)}
+              startIcon={<TrendingDown />}
+              // variant="outlined"
+            />
+            <Button
+              title="New Invoice"
+              onClick={() => setInvoiceModal(true)}
+              startIcon={<Add />}
+            />
+          </Stack>
+        </Box>
 
-            <Typography
-              variant="body2"
-              sx={{ textAlign: "right", color: "text.secondary" }}
+        {/* ==========================================
+            2. DASHBOARD KPI & PROGRESS CARDS
+        ========================================== */}
+        <Grid container spacing={3}>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 3,
+                height: "100%",
+                border: "1px solid #e2e8f0",
+                borderRadius: 2,
+              }}
             >
-              {30} Days left
-            </Typography>
-          </Box>
-        </Paper>
+              <Typography variant="subtitle2" color="text.secondary">
+                Making Tax Digital (MTD)
+              </Typography>
 
-        <Paper sx={{ padding: 2, width: "50%" }}>
-          <SnapRecieptCard
-            title="Snap Reciept"
-            handleFormChange={(formData) => console.log(formData)}
-          />
+              <Box sx={{ my: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                  Current MTD Quarter: {quarterLabel} ({range})
+                </Typography>
+
+                <LinearProgress
+                  variant="determinate"
+                  value={progressPercent}
+                  sx={{
+                    width: "100%",
+                    borderRadius: 2,
+                    height: 8,
+                    mt: 1.5,
+                    mb: 1,
+                  }}
+                />
+              </Box>
+
+              <Typography variant="caption" color="text.secondary">
+                ⏱️ <b>{daysRemaining} Days</b> left in current tax quarter
+              </Typography>
+            </Paper>
+          </Grid>
+
+          {/* Placeholder KPI: Total Revenue */}
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 3,
+                height: "100%",
+                border: "1px solid #e2e8f0",
+                borderRadius: 2,
+              }}
+            >
+              <Typography variant="subtitle2" color="text.secondary">
+                Total Income (YTD)
+              </Typography>
+              <Typography
+                variant="h4"
+                sx={{ my: 1, fontWeight: "bold" }}
+                color="success.main"
+              >
+                £0.00
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Updated in real-time
+              </Typography>
+            </Paper>
+          </Grid>
+
+          {/* Placeholder KPI: Total Expenses */}
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 3,
+                height: "100%",
+                border: "1px solid #e2e8f0",
+                borderRadius: 2,
+              }}
+            >
+              <Typography variant="subtitle2" color="text.secondary">
+                Total Expenses (YTD)
+              </Typography>
+              <Typography
+                variant="h4"
+                color="error.main"
+                sx={{ my: 1, fontWeight: "bold" }}
+              >
+                £0.00
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Ready for tax calculation
+              </Typography>
+            </Paper>
+          </Grid>
+        </Grid>
+
+        {/* ==========================================
+            3. RECENT ACTIVITY TABLE
+        ========================================== */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            border: "1px solid #e2e8f0",
+            borderRadius: 2,
+          }}
+        >
           <Box
             sx={{
               display: "flex",
-              gap: 1,
-              margin: 2,
-              justifyContent: "center",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 2,
             }}
           >
-            <Button onClick={() => setIncomeModal(true)} title="Log Income" />
-            <Button title="Log Expense" onClick={() => setExpenseModal(true)} />
-
-            <Button title="New Invoice" onClick={() => setInvoiceModal(true)} />
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              Recent Activity
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Invoices, Expenses & Income
+            </Typography>
           </Box>
-        </Paper>
+          <Divider sx={{ mb: 2 }} />
 
-        <Paper sx={{ width: "50%", padding: 2 }}>
-          <Typography variant="h5">Recent Activity</Typography>
-          <Divider />
-          <RecentTable />
+          {/* Render your recent items table */}
+          {/* <RecentTable /> */}
         </Paper>
-      </Box>
+      </Stack>
+
+      {/* ==========================================
+          4. MODALS
+      ========================================== */}
       <ExpenseModal
         open={expenseModal}
         handleClose={() => setExpenseModal(false)}
@@ -147,12 +287,12 @@ const Home = () => {
         open={invoiceModal}
         handleClose={() => setInvoiceModal(false)}
       />
-
-      <InvoicePreviewModal
+      {/* <InvoicePreviewModal
         blob={invoiceBlob}
         onClose={() => setInvoiceBlob(null)}
-      />
-    </>
+        open={false}
+      /> */}
+    </Container>
   );
 };
 

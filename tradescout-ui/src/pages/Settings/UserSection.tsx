@@ -8,103 +8,129 @@ const UserSection = ({ user }) => {
   const { mutate: updateUser } = usePutUser();
 
   const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [passwordError, setPasswordError] = useState<string>("");
+
   const [userForm, setUserForm] = useState({
     id: user.id,
-    email: user.email,
-    name: user.name,
+    email: user.email || "",
+    name: user.name || "",
     newPassword: "",
   });
 
-  const handleNewPasswordChange = (value: string) => {
-    setUserForm({ ...userForm, newPassword: value });
-  };
-
-  const handleConfirmPasswordChange = (value: string) => {
-    if (value !== newPassword) {
-      console.log("need to match");
-    }
-    setConfirmPassword(value);
-  };
-
-  const handleSavePasswordChange = () => {
-    if (userForm.newPassword !== confirmPassword) {
-      console.log("passwords not match");
-    }
-    if (!passwordCheck(userForm.newPassword)) {
-      console.log("password not meet requirements");
-    }
-
-    updateUser(userForm);
-  };
-
-  const handleChange = (event: { target: { name: string; value: string } }) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setUserForm({ ...userForm, [name]: value });
   };
 
   const handleDetailSave = () => {
-    updateUser(userForm);
+    // Only send name and email
+    updateUser({ id: userForm.id, email: userForm.email, name: userForm.name });
+  };
+
+  const handleSavePasswordChange = () => {
+    setPasswordError(""); // Reset error state
+
+    if (userForm.newPassword !== confirmPassword) {
+      setPasswordError("Passwords do not match");
+      return;
+    }
+    if (!passwordCheck(userForm.newPassword)) {
+      setPasswordError("Password must be at least 8 characters");
+      return;
+    }
+
+    // Only send the password update
+    updateUser({ id: userForm.id, newPassword: userForm.newPassword });
+
+    // Clear fields after saving
+    setUserForm({ ...userForm, newPassword: "" });
+    setConfirmPassword("");
   };
 
   return (
-    <Stack sx={{ m: 2, gap: 2 }}>
-      <Typography variant="h3">Your details</Typography>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <Box>
-          <Typography>Email</Typography>
+    <Stack spacing={4}>
+      {/* --- PROFILE DETAILS --- */}
+      <Box>
+        <Typography variant="h6" gutterBottom>
+          Profile Details
+        </Typography>
+        <Stack spacing={3} sx={{ maxWidth: 400, mt: 2 }}>
           <TextField
+            label="Email"
             name="email"
             value={userForm.email}
-            placeholder={user.email}
             type="email"
-            onChange={(event) => handleChange(event)}
+            onChange={handleChange}
+            fullWidth
           />
-        </Box>
-        <Box>
-          <Typography>Name</Typography>
           <TextField
+            label="Name"
             name="name"
             value={userForm.name}
-            placeholder={user.name}
-            onChange={(event) => handleChange(event)}
+            onChange={handleChange}
+            fullWidth
           />
-        </Box>
-        <Button
-          title="Save Changes"
-          onClick={handleDetailSave}
-          sx={{ width: "25%" }}
-        />
+          <Box>
+            <Button title="Save Changes" onClick={handleDetailSave} />
+          </Box>
+        </Stack>
       </Box>
 
-      {user.authProvider === "local" ? (
-        <Typography>No linked accounts</Typography>
-      ) : (
-        <>
-          <Typography>Linked Accounts</Typography>
-          <TextField value={user.authProvider} disabled />
-        </>
-      )}
+      <Divider />
 
+      {/* --- PASSWORD & SECURITY --- */}
       <Box>
-        <Box>
-          <TextField
-            placeholder="New Password"
-            value={userForm.newPassword}
-            onChange={(event) => handleNewPasswordChange(event.target.value)}
-          />
-          <TextField
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(event) =>
-              handleConfirmPasswordChange(event.target.value)
-            }
-          />
-        </Box>
+        <Typography variant="h6" gutterBottom>
+          Security
+        </Typography>
 
-        <Button title="Save password" onClick={handleSavePasswordChange} />
+        {user.authProvider !== "local" ? (
+          <Typography color="text.secondary" sx={{ mt: 1 }}>
+            You log in using <b>{user.authProvider}</b>. Password changes are
+            managed by your provider.
+          </Typography>
+        ) : (
+          <Stack spacing={3} sx={{ maxWidth: 400, mt: 2 }}>
+            <TextField
+              label="New Password"
+              name="newPassword"
+              type="password"
+              value={userForm.newPassword}
+              onChange={handleChange}
+              fullWidth
+            />
+            <TextField
+              label="Confirm Password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              error={!!passwordError}
+              helperText={passwordError}
+              fullWidth
+            />
+            <Box>
+              <Button
+                title="Update Password"
+                onClick={handleSavePasswordChange}
+              />
+            </Box>
+          </Stack>
+        )}
       </Box>
 
-      <Button title="Delete account" color="error" onClick={() => {}} />
+      <Divider />
+
+      {/* --- DANGER ZONE --- */}
+      <Box>
+        <Typography variant="h6" color="error" gutterBottom>
+          Danger Zone
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Once you delete your account, there is no going back. Please be
+          certain.
+        </Typography>
+        <Button title="Delete Account" color="error" onClick={() => {}} />
+      </Box>
     </Stack>
   );
 };

@@ -1,12 +1,27 @@
-import { Box, CircularProgress, TextField, Typography } from "@mui/material";
+import { useState, useEffect } from "react";
+import {
+  Box,
+  CircularProgress,
+  TextField,
+  Typography,
+  Container,
+  Paper,
+  Divider,
+  Alert,
+  Stack,
+} from "@mui/material";
+import { useNavigate } from "@tanstack/react-router";
+import { Google as GoogleIcon } from "@mui/icons-material";
+
+// Custom Components & Hooks
 import Button from "../../components/Button/Button";
 import { useLogin } from "../../hooks/User/useLogin/useLogin";
-import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth/useAuth";
-import { useNavigate } from "@tanstack/react-router";
 
 const Login = () => {
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const [validationError, setValidationError] = useState<string>("");
+
   const { mutate, isPending, error } = useLogin();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -17,71 +32,135 @@ const Login = () => {
     }
   }, [user, navigate]);
 
-  const handleLogin = () => {
-    if (!loginForm.email || !loginForm.password) {
-      console.log("need email and password");
-    } else {
-      mutate(loginForm);
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setLoginForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleChange = (event: { target: { name: string; value: string } }) => {
-    const { name, value } = event.target;
-    setLoginForm({ ...loginForm, [name]: value });
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setValidationError("");
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!loginForm.email || !loginForm.password) {
+      setValidationError("Please enter both email and password.");
+      return;
+    }
+
+    if (!emailRegex.test(loginForm.email)) {
+      setValidationError("Please enter a valid email address.");
+      return;
+    }
+
+    mutate(loginForm);
   };
 
   const handleGoogleLogin = () => {
     window.location.href = "http://localhost:3000/api/auth/google";
   };
 
-  if (isPending) {
-    return <CircularProgress />;
-  }
-
-  if (error) {
-    console.log(error);
-  }
-
   return (
-    <>
-      <Box
+    <Container
+      maxWidth="xs"
+      sx={{ minHeight: "80vh", display: "flex", alignItems: "center" }}
+    >
+      <Paper
+        elevation={3}
         sx={{
+          p: 4,
+          width: "100%",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          boxShadow: 4,
-          width: "30%",
-          padding: 2,
-          margin: 2,
-          gap: 2,
+          gap: 2.5,
+          borderRadius: 2,
         }}
       >
-        <Typography variant="h5">Welcome to TradeScout</Typography>
-        <Box>
-          <Typography>Email</Typography>
+        <Box sx={{ textAlign: "center" }}>
+          <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+            TradeScout
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            Sign in to your account
+          </Typography>
+        </Box>
+
+        {/* Display Validation or Mutation Errors */}
+        {(validationError || error) && (
+          <Alert severity="error">
+            {validationError ||
+              (error as Error)?.message ||
+              "Login failed. Please try again."}
+          </Alert>
+        )}
+
+        {/* Form Container */}
+        <Box
+          component="form"
+          onSubmit={handleLogin}
+          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+        >
           <TextField
+            fullWidth
+            label="Email Address"
             name="email"
-            onChange={handleChange}
+            type="email"
             value={loginForm.email}
-          />
-        </Box>
-        <Box>
-          <Typography>Password</Typography>
-          <TextField
-            name="password"
             onChange={handleChange}
+            autoComplete="email"
+          />
+
+          <TextField
+            fullWidth
+            label="Password"
+            name="password"
+            type="password" // Masks password characters
             value={loginForm.password}
+            onChange={handleChange}
+            autoComplete="current-password"
+          />
+
+          <Button
+            title={isPending ? "Signing in..." : "Login"}
+            // disabled={isPending}
+            startIcon={
+              isPending ? <CircularProgress size={20} color="inherit" /> : null
+            }
+            onClick={handleLogin}
           />
         </Box>
-        <Button onClick={handleLogin} title="Login" />
-      </Box>
 
-      <Box>
-        <Button onClick={handleGoogleLogin} title="Sign in with google" />
-      </Box>
+        <Divider sx={{ my: 1 }}>OR</Divider>
 
-      <Button title="Create Account" onClick={() => {}} />
-    </>
+        {/* OAuth & Registration Actions */}
+        <Stack spacing={2}>
+          <Button
+            onClick={handleGoogleLogin}
+            title="Sign in with Google"
+            startIcon={<GoogleIcon />}
+          />
+
+          <Box sx={{ textAlign: "center", mt: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Don't have an account?
+              <Typography
+                component="span"
+                variant="body2"
+                color="primary"
+                sx={{
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  textDecoration: "underline",
+                }}
+                onClick={() => navigate({ to: "/register" })}
+              >
+                Create Account
+              </Typography>
+            </Typography>
+          </Box>
+        </Stack>
+      </Paper>
+    </Container>
   );
 };
 

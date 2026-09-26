@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
 import { InvoiceStatusEnum } from './InvoiceEnums';
-import { Business } from '../Business/Business.entity';
-import { Expense } from '../Expense/Expense.entity';
-import { Income } from '../Income/Income.entity';
+import { Business } from 'src/Business/Business.entity';
+// import { Expense } from '../Expense/Expense.entity';
+// import { Income } from '../Income/Income.entity';
 
 @Entity('invoices')
 export class Invoice {
@@ -25,7 +25,7 @@ export class Invoice {
   snapshotData: Record<string, any>;
 
   @Column({ type: 'timestamp', nullable: true })
-  issuedAt: Date;
+  issuedAt: Date | null;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -36,20 +36,13 @@ export class Invoice {
   @DeleteDateColumn()
   deletedAt: Date
 
-
-
-  // --- Relationships ---
-  
   @ManyToOne(() => Business, (business) => business.invoices)
-  @JoinColumn({ name: 'businessId' })
   business: Business;
 
-  @Column()
-  businessId: string;
+  // @OneToMany(() => Income, (income) => income.invoice)
+  // payments: Income[];
 
-  @OneToMany(() => Income, (income) => income.invoice)
-  payments: Income[];
+  // @OneToMany(() => Expense, (expense) => expense.invoice)
+  // jobExpenses: Expense[];
 
-  @OneToMany(() => Expense, (expense) => expense.invoice)
-  jobExpenses: Expense[];
 }

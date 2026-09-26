@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { SeedService } from './seed.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Expense } from '../Expense/Expense.entity';
-import { Income } from '../Income/Income.entity';
+// import { Expense } from '../Expense/Expense.entity';
+// import { Income } from '../Income/Income.entity';
 import { User } from '../User/User.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Income, Expense])],
+  imports: [TypeOrmModule.forFeature([User])],
   providers: [SeedService],
   exports: [SeedService],
 })

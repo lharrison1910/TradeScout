@@ -1,28 +1,27 @@
 import { useEffect, useMemo, useState } from "react";
 import { AuthContext, type AuthContextType } from "./auth.context";
 import type { User } from "../../types/User";
-import { setAccessToken } from "../../api/BaseApi";
 import { userApiClient } from "../../api/UserApiClient";
 
 type AuthProviderProps = { children: React.ReactNode };
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | undefined>();
-  const [selectedBusiness, setSelectedBusiness] = useState<string>("");
+  const [selectedBusiness, setSelectedBusiness] = useState<number>();
   const [loading, setLoading] = useState<boolean>(true);
 
   const login = (data: { accessToken: string; user: User }) => {
     const { accessToken, user } = data;
-    setAccessToken(accessToken);
+    sessionStorage.setItem("accessToken", accessToken);
     setUser(user);
-    setSelectedBusiness(user.businesses[0].id);
+    setSelectedBusiness(user?.businesses[0].id);
   };
 
-  const updateSelectedBusiness = (newBusiness: string) =>
+  const updateSelectedBusiness = (newBusiness: number) =>
     setSelectedBusiness(newBusiness);
 
   const logout = () => {
-    setAccessToken(null);
+    sessionStorage.removeItem("accessToken");
     setUser(undefined);
   };
 
@@ -30,13 +29,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const bootstrapAuth = async () => {
       try {
         const data = await userApiClient.refresh();
-        setAccessToken(data.accessToken);
+        sessionStorage.setItem("accessToken", data.accessToken);
 
         const profile = await userApiClient.me();
         setUser(profile);
         setSelectedBusiness(profile.businesses[0].id);
       } catch (_error) {
-        setAccessToken(null);
+        sessionStorage.removeItem("accessToken");
         setUser(null);
       } finally {
         setLoading(false);

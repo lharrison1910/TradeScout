@@ -4,8 +4,8 @@ import type { User } from "../../types/User";
 
 export interface AuthContextType {
   user: User | null;
-  selectedBusiness: string;
-  updateSelectedBusiness: (newBusiness: string) => void;
+  selectedBusiness: number;
+  updateSelectedBusiness: (newBusiness: number) => void;
   isAuthenticated: boolean;
   isPending: boolean;
   login: (data: { accessToken: string; user: User }) => void;
@@ -15,8 +15,8 @@ export interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
-  selectedBusiness: "",
-  updateSelectedBusiness: (_newBusiness: string) => {},
+  selectedBusiness: 0,
+  updateSelectedBusiness: (_newBusiness: number) => {},
   isAuthenticated: false,
   isPending: false,
   login: (_data: { accessToken: string; user: User }) => {},

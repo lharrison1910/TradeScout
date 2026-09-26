@@ -12,11 +12,12 @@ class InvoiceApiClient extends BaseApi {
     return InvoiceApiClient.instance;
   }
 
-  async newInvoice(payload: NewInvoiceRequestSchema) {
-    const body = JSON.stringify(payload);
+  // async newInvoice(payload: NewInvoiceRequestSchema) {
+  //   const body = JSON.stringify(payload);
+  //   console.log(body);
 
-    return await this.blob(`${this.invoice}`, body);
-  }
+  //   return await this.blob(`${this.invoice}`, body);
+  // }
 
   async createInvoice(payload) {
     const body = JSON.stringify(payload);
@@ -36,6 +37,10 @@ class InvoiceApiClient extends BaseApi {
 
   async deleteInvoice(id: number) {
     return await this.delete(`${this.invoice}/${id}`);
+  }
+
+  async getInovices(businessId: number) {
+    return await this.get(`${this.invoice}?businessId=${businessId}`);
   }
 }
 

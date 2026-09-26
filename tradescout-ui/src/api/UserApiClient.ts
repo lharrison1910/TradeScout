@@ -1,5 +1,5 @@
 import type { LoginPayload } from "../types/loginPayload";
-import { BaseApi, executeSilentRefresh } from "./BaseApi";
+import { BaseApi } from "./BaseApi";
 
 class UserApiClient extends BaseApi {
   private readonly auth = "auth";
@@ -40,13 +40,17 @@ class UserApiClient extends BaseApi {
     return await this.put(`${this.user}`, body);
   }
 
+  async register(payload) {
+    const body = JSON.stringify(payload);
+    return await this.post(`${this.auth}/register`, body);
+  }
+
   async me() {
     return await this.get(`${this.auth}/me`);
   }
 
   async refresh() {
-    const accessToken = await executeSilentRefresh(this.url);
-    return { accessToken };
+    return await this.post(`${this.auth}/refresh`, "");
   }
 }
 

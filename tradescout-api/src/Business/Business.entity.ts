@@ -1,6 +1,5 @@
-import { Invoice } from '../Invoice/Invoice.entity';
-import { Expense } from '../Expense/Expense.entity';
-import { Income } from '../Income/Income.entity';
+
+import { Invoice } from 'src/Invoice/Invoice.entity';
 import { User } from '../User/User.entity';
 import {
   Column,
@@ -15,32 +14,35 @@ import {
 
 @Entity('business')
 export class Business {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn({ type: 'integer' })
+  id: number;
 
-  @Column({ type: 'varchar' })
-  name: string;
+  @Column({type: 'varchar'})
+  businessName: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  taxReference?: string | null;
+  @Column({type: 'varchar'})
+  vatNumber: string
 
-  @Column()
-  userId: number;
+  @Column({type: 'varchar'})
+  taxReference: string;
+
+  @Column({type: 'varchar'})
+  bankName: string;
+
+  @Column({type: 'varchar'})
+  bankAccountName: string;
+
+  @Column({type: 'varchar'})
+  bankAccountNumber: string;
+
+  @Column({type: 'varchar'})
+  bankSortCode: string;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
-
-  @DeleteDateColumn()
-  deletedAt: Date;
-
-  @OneToMany(() => Income, (income) => income.business)
-  income: Income[];
-
-  @OneToMany(() => Expense, (expense) => expense.business)
-  expense: Expense[];
 
   @ManyToOne(() => User, (user) => user.businesses)
   user: User;
