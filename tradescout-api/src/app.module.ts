@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
 import { LoggerModule } from 'nestjs-pino';
 import { TypeOrmModule } from '@nestjs/typeorm';
-// import { IncomeModule } from './Income/Income.module';
-// import { ExpenseModule } from './Expense/Expense.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './Auth/Auth.module';
 import { SeedModule } from './seed/seed.module';
 import { HealthModule } from './Health/Health.module';
@@ -14,6 +12,9 @@ import { RefreshTokenModule } from './RefreshToken/refreshToken.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     LoggerModule.forRoot({
       pinoHttp: {
         transport:
@@ -22,18 +23,22 @@ import { RefreshTokenModule } from './RefreshToken/refreshToken.module';
             : undefined,
       },
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'tradescout',
-      password: 'temp_pass',
-      database: 'Local',
-      autoLoadEntities: true,
-      synchronize: true,
-    }),
-    ConfigModule.forRoot({
-      isGlobal: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        url: configService.get<string>('DATABASE_URL'),
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT')
+          ? Number(configService.get('DB_PORT'))
+          : 5432,
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_DATABASE'),
+        autoLoadEntities: true,
+        synchronize: configService.get<string>('NODE_ENV') !== 'production',
+      }),
     }),
     // IncomeModule,
     // ExpenseModule,
@@ -43,7 +48,7 @@ import { RefreshTokenModule } from './RefreshToken/refreshToken.module';
     BuisnessModule,
     UserModule,
     InvoiceModule,
-    RefreshTokenModule
+    RefreshTokenModule,
   ],
   controllers: [],
   providers: [],

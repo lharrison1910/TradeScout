@@ -1,5 +1,6 @@
+const baseUrl = import.meta.env.VITE_API_URL;
 export class BaseApi {
-  constructor(readonly url = "http://localhost:3000/api") {}
+  constructor(readonly url = `${baseUrl}/api`) {}
 
   private async refreshAccessToken(): Promise<string> {
     try {

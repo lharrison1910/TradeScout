@@ -10,6 +10,11 @@ services:
     ports:
       - "5432:5432"
     platform: linux/x86_64
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tradescout -d Local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   pgadmin:
     image: dpage/pgadmin4
@@ -20,15 +25,35 @@ services:
       - "5051:80"
 
   api:
+    container_name: api
     build:
       context: ./tradescout-api
       dockerfile: Dockerfile     
-    container_name: api
-    env_file:
-      - .env
     restart: always
+    env_file:
+      - ./tradescout-api/.env
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - DB_HOST=db
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+  frontend:
+    container_name: ui
+    build:
+      context: ./tradescout-ui 
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:3000
+    restart: always
+    env_file:
+      - ./tradescout-ui/.env
+    ports:
+      - "80:80"
+    depends_on:
+      - api

@@ -22,7 +22,7 @@ async function bootstrap() {
   app.useLogger(app.get(Logger));
   app.setGlobalPrefix('api');
   app.enableCors({
-    origin: 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   });
 
@@ -34,7 +34,7 @@ async function bootstrap() {
   const seed = app.get(SeedService);
   await seed.run();
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
 }
 
 void bootstrap();
