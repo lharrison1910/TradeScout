@@ -70,6 +70,14 @@ export class InvoiceController {
     return await this.invoiceService.deleteDraft(id, currentUser);
   }
 
+  @Post(':id/void')
+  async voidInvoice(
+    @Param('id') id: number,
+    @CurrentUser() currentUser: CurrentUserType,
+  ) {
+    return await this.invoiceService.voidInvoice(id, currentUser);
+  }
+
   @Post(':id/issue')
   async issueInvoice(@Param('id') id: number, @Res() res: Response) {
     // const fileBuffer = await this.invoiceService.issueInvoice(id)
@@ -83,34 +91,31 @@ export class InvoiceController {
   }
 
   @Get(':id/download')
-  async downloadInvoice(@Param('id') id: number, @Res() res: Response) {
-    // const fileBuffer = await this.invoiceService.downloadInvoice(id)
-    // res.set({
-    //   'Content-Type':
-    //   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    //   'Content-Disposition': `attachment; filename=Invoice_${id}.docx`,
-    //   'Content-Length': fileBuffer.length,
-    // });
-    // res.send(fileBuffer);
-  }
-
-  @Get(':id')
-  async getJobDetails(@Param('id') id: number) {
-    // return await this.invoiceService.getJobDetails(id)
-  }
-
-  @Post(':id/pay')
-  async recordPayment(
+  async downloadInvoice(
     @Param('id') id: number,
+    @Res() res: Response,
     @CurrentUser() currentUser: CurrentUserType,
   ) {
-    // return await this.invoiceService.recordPayment(id, currentUser)
+    const fileBuffer = await this.invoiceService.downloadInvoice(
+      id,
+      currentUser,
+    );
+    res.set({
+      'Content-Type':
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'Content-Disposition': `attachment; filename=Invoice_${id}.docx`,
+      'Content-Length': fileBuffer.length,
+    });
+    res.send(fileBuffer);
   }
 
-  @Post(':id/void')
-  async voidInvoice(@Param('id') id: number) {
-    // return await this.invoiceService.voidInvoice(id)
-  }
+  // @Post(':id/pay')
+  // async recordPayment(
+  //   @Param('id') id: number,
+  //   @CurrentUser() currentUser: CurrentUserType,
+  // ) {
+  //   // return await this.invoiceService.recordPayment(id, currentUser)
+  // }
 
   @Get()
   async findAllByQuery(
@@ -119,18 +124,4 @@ export class InvoiceController {
   ) {
     return await this.invoiceService.listInvoiceByFilter(query, currentUser);
   }
-
-  // @Post()
-  // async newInvoice(@Body() body: NewInvoiceRequestSchema, @Res() res: Response) {
-  //   const fileBuffer = await this.invoiceService.newInvoice(body);
-
-  //   res.set({
-  //     'Content-Type':
-  //       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  //     'Content-Disposition': `attachment; filename=Invoice_${body.invoice_number}.docx`,
-  //     'Content-Length': fileBuffer.length,
-  //   });
-
-  //   res.send(fileBuffer);
-  // }
 }

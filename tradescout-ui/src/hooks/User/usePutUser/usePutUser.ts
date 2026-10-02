@@ -4,5 +4,5 @@ import { userApiClient } from "../../../api/UserApiClient";
 export const usePutUser = () =>
   useMutation({
     mutationKey: ["usePutUser"],
-    mutationFn: (payload) => userApiClient.updateUser(payload),
+    mutationFn: (payload: unknown) => userApiClient.updateUser(payload),
   });

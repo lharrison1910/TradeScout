@@ -2,20 +2,24 @@ import { MoreVertOutlined } from "@mui/icons-material";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import type { GridColDef } from "@mui/x-data-grid";
 import { useState } from "react";
+import { useDeleteDraft } from "../../hooks/Invoice/useDeleteInvoiceDraft";
+import { useDownloadInvoice } from "../../hooks/Invoice/useDownloadInvoice";
 
 const ActionMenu = ({
   params,
   setSelectedId,
   openEditModal,
-  deleteDraft,
 }: {
   params: any;
   setSelectedId: (newId) => void;
   openEditModal: (editableInvoice) => void;
-  deleteDraft: (toDelete) => void;
 }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
+
+  const { mutateAsync: deleteDraft } = useDeleteDraft();
+
+  const { mutate: downloadInvoice } = useDownloadInvoice();
 
   const options = [
     {
@@ -31,14 +35,18 @@ const ActionMenu = ({
     {
       label: params.row.issuedAt ? "Void" : "Delete",
       onClick: () => {
-        if (params.row.issuedAt === "Delete") {
+        if (!params.row.issuedAt) {
           deleteDraft(params.row.id);
+        } else {
         }
       },
     },
     {
-      label: params.row.issuedAt ? "Download" : "Issue",
-      onClick: () => null,
+      // label: params.row.issuedAt ? "Download" : "Issue",
+      label: "Download",
+      onClick: () => {
+        downloadInvoice(params.row.id);
+      },
     },
   ];
 
@@ -76,11 +84,7 @@ const ActionMenu = ({
   );
 };
 
-export const getColumns = ({
-  setSelectedId,
-  openEditModal,
-  deleteDraft,
-}): GridColDef[] => [
+export const getColumns = ({ setSelectedId, openEditModal }): GridColDef[] => [
   {
     field: "actions",
     headerName: "",
@@ -90,7 +94,6 @@ export const getColumns = ({
         params={params}
         setSelectedId={setSelectedId}
         openEditModal={openEditModal}
-        deleteDraft={deleteDraft}
       />
     ),
   },

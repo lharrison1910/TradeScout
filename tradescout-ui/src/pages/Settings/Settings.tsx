@@ -20,6 +20,7 @@ import { Edit, Delete, Add } from "@mui/icons-material";
 import { useAuth } from "../../hooks/useAuth/useAuth";
 import Button from "../../components/Button/Button";
 import BusinessModal from "../../components/BusinessModal/BusinessModal";
+import type { Business } from "../../types/Business";
 
 // import {
 //   useDeleteBusiness,
@@ -190,16 +191,16 @@ const UserSection = ({ user }) => {
   );
 };
 
-const BusinessSection = ({ businesses }) => {
+const BusinessSection = ({ businesses }: { businesses: Business[] }) => {
   // const { mutate: deleteBusiness } = useDeleteBusiness();
   // const { mutate: putBusiness } = usePutBusiness();
   // const { mutate: postBusiness } = usePostBusiness();
 
   const [modal, setModal] = useState<boolean>(false);
-  const [form, setForm] = useState();
+  const [form, setForm] = useState<Business | null>(null);
 
   const handleEdit = (businessId: string) => {
-    setForm(businesses.find((business) => business.id === businessId));
+    setForm(businesses.find((business) => business.id === Number(businessId)));
     setModal(true);
   };
 
@@ -242,14 +243,13 @@ const BusinessSection = ({ businesses }) => {
               </TableCell>
             </TableRow>
           ) : (
-            businesses.map((business) => (
+            businesses.map((business: Business) => (
               <TableRow key={business.id} hover>
-                {/* Replaced disabled TextFields with standard text */}
-                <TableCell>{business.businessName || business.name}</TableCell>
+                <TableCell>{business.businessName}</TableCell>
                 <TableCell>{business.taxReference || "N/A"}</TableCell>
                 <TableCell align="right">
                   <IconButton
-                    onClick={() => handleEdit(business.id)}
+                    onClick={() => handleEdit(`${business.id}`)}
                     size="small"
                     color="primary"
                   >

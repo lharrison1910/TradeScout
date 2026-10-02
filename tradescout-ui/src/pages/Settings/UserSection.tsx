@@ -1,10 +1,11 @@
-import { Box, Typography, TextField, Stack } from "@mui/material";
+import { Box, Typography, TextField, Stack, Divider } from "@mui/material";
 import { useState } from "react";
 import { passwordCheck } from "../../utils/passwordChecks";
 import { usePutUser } from "../../hooks/User/usePutUser/usePutUser";
 import Button from "../../components/Button/Button";
+import type { User } from "../../types/User";
 
-const UserSection = ({ user }) => {
+const UserSection = ({ user }: { user: User }) => {
   const { mutate: updateUser } = usePutUser();
 
   const [confirmPassword, setConfirmPassword] = useState<string>("");

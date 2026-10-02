@@ -27,9 +27,9 @@ class UserApiClient extends BaseApi {
     return await this.post(`${this.auth}/logout`, "");
   }
 
-  async googleLogin() {
-    return await this.get(`${this.auth}/google`);
-  }
+  // async googleLogin() {
+  //   return await this.get(`${this.auth}/google`);
+  // }
 
   async getUser() {
     return await this.get(`${this.user}`);

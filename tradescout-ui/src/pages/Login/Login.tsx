@@ -11,7 +11,7 @@ import {
   Stack,
 } from "@mui/material";
 import { useNavigate } from "@tanstack/react-router";
-import { Google as GoogleIcon } from "@mui/icons-material";
+// import { Google as GoogleIcon } from "@mui/icons-material";
 
 // Custom Components & Hooks
 import Button from "../../components/Button/Button";
@@ -56,9 +56,9 @@ const Login = () => {
     mutate(loginForm);
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:3000/api/auth/google";
-  };
+  // const handleGoogleLogin = () => {
+  //   window.location.href = "http://localhost:3000/api/auth/google";
+  // };
 
   return (
     <Container
@@ -130,15 +130,15 @@ const Login = () => {
           />
         </Box>
 
-        <Divider sx={{ my: 1 }}>OR</Divider>
+        {/* <Divider sx={{ my: 1 }}>OR</Divider> */}
 
         {/* OAuth & Registration Actions */}
         <Stack spacing={2}>
-          <Button
+          {/* <Button
             onClick={handleGoogleLogin}
             title="Sign in with Google"
             startIcon={<GoogleIcon />}
-          />
+          /> */}
 
           <Box sx={{ textAlign: "center", mt: 1 }}>
             <Typography variant="body2" color="text.secondary">

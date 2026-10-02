@@ -4,3 +4,9 @@
   display: grid;
   grid-template-rows: 7% 1fr;
 }
+
+
+
+.main-content {
+  flex: 1 0 auto;
+}

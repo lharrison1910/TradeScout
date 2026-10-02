@@ -82,30 +82,30 @@ export class AuthController {
     return { message: 'Logged out successfully' };
   }
 
-  @Get('google')
-  @UseGuards(AuthGuard('google'))
-  async googleAuth(@Req() _req: Request) {}
+  // @Get('google')
+  // @UseGuards(AuthGuard('google'))
+  // async googleAuth(@Req() _req: Request) {}
 
-  @Get('google/callback')
-  @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req: any, @Res() res: Response) {
-    const user = await this.authService.validateGoogleUser(req.user);
+  // @Get('google/callback')
+  // @UseGuards(AuthGuard('google'))
+  // async googleAuthRedirect(@Req() req: any, @Res() res: Response) {
+  //   const user = await this.authService.validateGoogleUser(req.user);
 
-    const jwtToken = this.authService.generateJwt({
-      sub: user.id,
-      email: user.email,
-    });
+  //   const jwtToken = this.authService.generateJwt({
+  //     sub: user.id,
+  //     email: user.email,
+  //   });
 
-    res.cookie('Authentication', jwtToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
-    });
+  //   res.cookie('Authentication', jwtToken, {
+  //     httpOnly: true,
+  //     secure: process.env.NODE_ENV === 'production',
+  //     sameSite: 'strict',
+  //     maxAge: 1000 * 60 * 60 * 24, // 1 day
+  //   });
 
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL');
-    return res.redirect(`${frontendUrl}/dashboard`);
-  }
+  //   const frontendUrl = this.configService.get<string>('FRONTEND_URL');
+  //   return res.redirect(`${frontendUrl}/dashboard`);
+  // }
 
   @UseGuards(AuthGuard('jwt'))
   @Get('me')

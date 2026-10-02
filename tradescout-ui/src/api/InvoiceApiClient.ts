@@ -42,6 +42,10 @@ class InvoiceApiClient extends BaseApi {
   async getInovices(businessId: number) {
     return await this.get(`${this.invoice}?businessId=${businessId}`);
   }
+
+  async downloadInvoice(invoiceId: number) {
+    return await this.blob(`${this.invoice}/${invoiceId}/download`);
+  }
 }
 
 export const invoiceApiClient = InvoiceApiClient.getInstance();

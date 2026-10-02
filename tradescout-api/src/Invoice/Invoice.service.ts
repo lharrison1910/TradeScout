@@ -428,7 +428,7 @@ export class InvoiceService {
         'You do not have permission to view invoices for this business',
       );
     }
-
+    console.log(business, 'I have business');
     try {
       const invoices = await this.invoiceRepository.find({
         where: { business: { id: businessId } },
@@ -607,6 +607,63 @@ export class InvoiceService {
     }
   }
 
+  async voidInvoice(invoiceId, requestingUser) {
+    let business: Business[] | null;
+
+    try {
+      business = await this.dataSource
+        .getRepository(Business)
+        .find({ where: { user: { id: requestingUser.userId } } });
+    } catch (error) {
+      this.logger.error(
+        `createDraft: failed to fetch businesses for user ${requestingUser.userId} - ${error}`,
+      );
+      throw new InternalServerErrorException(
+        'Failed to fetch related business',
+      );
+    }
+
+    if (!business) {
+      this.logger.error(
+        `createDraft: No businesses found for user ${requestingUser.userId}`,
+      );
+      throw new InternalServerErrorException('No businesses found');
+    }
+
+    let invoice: Invoice | null;
+    try {
+      invoice = await this.invoiceRepository.findOne({
+        where: { id: invoiceId },
+      });
+    } catch (error) {
+      this.logger.error(
+        `deleteDraft: Failed to find invoice ${invoiceId} - ${error}`,
+      );
+      throw new InternalServerErrorException('Failed to find invoice');
+    }
+
+    if (!invoice) {
+      throw new NotFoundException(`Invoice ${invoiceId} was not found`);
+    }
+
+    if (invoice.status === InvoiceStatusEnum.DRAFT) {
+      throw new BadRequestException(
+        `Invoive ${invoiceId} is a draft and cannot be fully deleted`,
+      );
+    }
+
+    try {
+      const deleted = await this.invoiceRepository.softDelete(invoiceId);
+
+      return deleted.affected;
+    } catch (error) {
+      this.logger.error(
+        `deleteDraft:k failed to delete invoice ${invoiceId} - ${error} `,
+      );
+      throw new InternalServerErrorException('Failed to delete invoice');
+    }
+  }
+
   async previewInvoice(invoiceId: number, requestingUser) {
     let invoice: Invoice | null;
 
@@ -649,6 +706,62 @@ export class InvoiceService {
     // if (!business.find((business) => business.id === body.businessId)) {
     //   throw new BadRequestException('Business not belong to user');
     // }
+
+    let buffer: Buffer<ArrayBufferLike>;
+    try {
+      buffer = this._getInvoiceBuffer(invoice.snapshotData);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        this.logger.error(`_getInvoiceBuffer: Template not found - ${error}`);
+        throw error;
+      }
+      this.logger.error(
+        `previewInvoice: failed to generate docx file - ${error}`,
+      );
+      throw new InternalServerErrorException('Failed to generate preivew');
+    }
+
+    return buffer;
+  }
+
+  async downloadInvoice(invoiceId: number, requestingUser) {
+    let invoice: Invoice | null;
+
+    try {
+      invoice = await this.invoiceRepository.findOne({
+        where: { id: invoiceId },
+      });
+    } catch (error) {
+      this.logger.error(
+        `previewInvoice: Failed to fetch ${invoiceId} from db - ${error}`,
+      );
+      throw new InternalServerErrorException(`Failed to fetch invoice`);
+    }
+
+    if (!invoice) {
+      throw new NotFoundException(`No invoice ${invoiceId} was found`);
+    }
+    let business: Business[] | null;
+
+    try {
+      business = await this.dataSource
+        .getRepository(Business)
+        .find({ where: { user: { id: requestingUser.userId } } });
+    } catch (error) {
+      this.logger.error(
+        `createDraft: failed to fetch businesses for user ${requestingUser.userId} - ${error}`,
+      );
+      throw new InternalServerErrorException(
+        'Failed to fetch related business',
+      );
+    }
+
+    if (!business) {
+      this.logger.error(
+        `createDraft: No businesses found for user ${requestingUser.userId}`,
+      );
+      throw new InternalServerErrorException('No businesses found');
+    }
 
     let buffer: Buffer<ArrayBufferLike>;
     try {

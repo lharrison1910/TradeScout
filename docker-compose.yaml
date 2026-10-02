@@ -18,3 +18,17 @@ services:
       PGADMIN_DEFAULT_PASSWORD: temp_pass
     ports:
       - "5051:80"
+
+  api:
+    build:
+      context: ./tradescout-api
+      dockerfile: Dockerfile     
+    container_name: api
+    env_file:
+      - .env
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000

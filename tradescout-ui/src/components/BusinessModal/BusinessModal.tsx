@@ -1,27 +1,18 @@
 import { useState, useEffect } from "react";
 import { Box, Typography, TextField, Grid, Divider } from "@mui/material";
 import Modal from "../Modal/Modal";
+import type { Business } from "../../types/Business";
 
 // 1. Updated to perfectly match your TypeORM schema
-interface BusinessData {
-  id?: number;
-  businessName?: string;
-  vatNumber?: string;
-  taxReference?: string;
-  bankName?: string;
-  bankAccountName?: string;
-  bankSortCode?: string;
-  bankAccountNumber?: string;
-}
 
 interface BusinessModalProps {
   open: boolean;
   handleClose: () => void;
-  data?: BusinessData;
-  handleSave: (data: BusinessData) => void;
+  data?: Business;
+  handleSave: (data: Business) => void;
 }
 
-const emptyForm: BusinessData = {
+const emptyForm: Business = {
   businessName: "",
   vatNumber: "",
   taxReference: "",
@@ -37,7 +28,7 @@ const BusinessModal = ({
   data,
   handleSave,
 }: BusinessModalProps) => {
-  const [formData, setFormData] = useState<BusinessData>(emptyForm);
+  const [formData, setFormData] = useState<Business>(emptyForm);
 
   useEffect(() => {
     if (open) {

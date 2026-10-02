@@ -7,15 +7,12 @@ import { useMemo, useState } from "react";
 import InvoiceModal from "../../components/InvoiceModal/InvoiceModal";
 import InvoicePreviewModal from "../../components/InvoicePreviewModal/InvoicePreviewModal";
 import { useGetPreview } from "../../hooks/Invoice/useGetPreview";
-import { useDeleteDraft } from "../../hooks/Invoice/useDeleteInvoiceDraft";
 
 const Invoice = () => {
   const { data: invoices } = useGetInvoices();
 
   const [selectedId, setSelectedId] = useState<number | undefined>();
   const { data: blob } = useGetPreview(selectedId);
-
-  const { mutateAsync: deleteDraft } = useDeleteDraft();
 
   const [invoiceToEdit, setInvoiceToEdit] = useState();
 
@@ -55,7 +52,7 @@ const Invoice = () => {
     setInvoiceModal(true);
   };
 
-  const columns = getColumns({ setSelectedId, openEditModal, deleteDraft });
+  const columns = getColumns({ setSelectedId, openEditModal });
 
   return (
     <>

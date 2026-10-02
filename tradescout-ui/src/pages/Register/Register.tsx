@@ -12,7 +12,7 @@ import {
   Grid,
 } from "@mui/material";
 import { useNavigate } from "@tanstack/react-router";
-import { Google as GoogleIcon } from "@mui/icons-material";
+// import { Google as GoogleIcon } from "@mui/icons-material";
 
 // Custom Components & Hooks
 import Button from "../../components/Button/Button";
@@ -115,9 +115,9 @@ const Register = () => {
     });
   };
 
-  const handleGoogleSignUp = () => {
-    window.location.href = "http://localhost:3000/api/auth/google";
-  };
+  // const handleGoogleSignUp = () => {
+  //   window.location.href = "http://localhost:3000/api/auth/google";
+  // };
 
   return (
     <Container maxWidth="sm" sx={{ py: 6 }}>
@@ -339,12 +339,12 @@ const Register = () => {
 
         {/* OAuth & Login Redirect */}
         <Stack spacing={2}>
-          <Button
+          {/* <Button
             onClick={handleGoogleSignUp}
             title="Sign up with Google"
             startIcon={<GoogleIcon />}
             // variant="outlined"
-          />
+          /> */}
 
           <Box sx={{ textAlign: "center", mt: 1 }}>
             <Typography variant="body2" color="text.secondary">

@@ -94,33 +94,33 @@ export class AuthService {
     return await this.userRepository.save(newUser);
   }
 
-  async validateGoogleUser(googleUser: any): Promise<User> {
-    // 1. Check if the user already exists by email
-    let user = await this.userRepository.findOne({
-      where: { email: googleUser.email },
-    });
+  // async validateGoogleUser(googleUser: any): Promise<User> {
+  //   // 1. Check if the user already exists by email
+  //   let user = await this.userRepository.findOne({
+  //     where: { email: googleUser.email },
+  //   });
 
-    if (user) {
-      // Optional: If they previously registered locally, you can update their provider ID here
-      if (!user.providerId) {
-        user.providerId = googleUser.providerId;
-        user.authProvider = AuthProviderType.GOOGLE;
-        await this.userRepository.save(user);
-      }
-      return user;
-    }
+  //   if (user) {
+  //     // Optional: If they previously registered locally, you can update their provider ID here
+  //     if (!user.providerId) {
+  //       user.providerId = googleUser.providerId;
+  //       user.authProvider = AuthProviderType.GOOGLE;
+  //       await this.userRepository.save(user);
+  //     }
+  //     return user;
+  //   }
 
-    // 2. If no user exists, create a new one
-    const newUser = this.userRepository.create({
-      email: googleUser.email,
-      name: `${googleUser.firstName} ${googleUser.lastName}`,
-      authProvider: AuthProviderType.GOOGLE,
-      providerId: googleUser.providerId,
-      termsAccepted: true, // You may want to handle this differently depending on your UX
-    });
+  //   // 2. If no user exists, create a new one
+  //   const newUser = this.userRepository.create({
+  //     email: googleUser.email,
+  //     name: `${googleUser.firstName} ${googleUser.lastName}`,
+  //     authProvider: AuthProviderType.GOOGLE,
+  //     providerId: googleUser.providerId,
+  //     termsAccepted: true, // You may want to handle this differently depending on your UX
+  //   });
 
-    return await this.userRepository.save(newUser);
-  }
+  //   return await this.userRepository.save(newUser);
+  // }
 
   async verifyRefreshToken(token: string) {
     try {
